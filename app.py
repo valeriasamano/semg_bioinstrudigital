@@ -5,6 +5,9 @@ from datetime import datetime
 
 app = Flask(__name__)
 CSV_FILE = 'datos_pacientes.csv'
+@app.route('/')
+def home():
+    return render_template('index.html')
 
 # Si el archivo CSV no existe, lo crea con sus columnas correspondientes
 if not os.path.exists(CSV_FILE):
