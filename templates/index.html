@@ -10,7 +10,8 @@
     <style>
         .animate-fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .transition-all { transition: all 0.3s ease; }
+        #rep-table-body::-webkit-scrollbar { width: 4px; }
+        #rep-table-body::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
     </style>
 </head>
 <body class="bg-[#F8FAFC] text-slate-900 font-sans">
@@ -36,30 +37,30 @@
         <div id="vista-info" class="py-12 space-y-12 animate-fade-in">
             <div class="max-w-3xl">
                 <h2 class="text-5xl font-light text-slate-800 leading-tight mb-6 italic">Medición fisiológica <br><strong> de sEMG </strong></h2>
-                <p class="text-slate-500 text-lg leading-relaxed italic font-medium">Registro con estampado de tiempo para análisis de contracciones musculares.</p>
+                <p class="text-slate-500 text-lg leading-relaxed italic font-medium">Registro con marcado de eventos y tabla cronometrada de contracciones.</p>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-center">
+                <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
                     <p class="text-[10px] font-black text-blue-600 uppercase mb-2 tracking-widest">Hardware</p>
                     <p class="text-sm font-bold text-slate-700 italic">MyoWare 2.0 & Arduino Uno R4</p>
                 </div>
                 <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
-                    <p class="text-[10px] font-black text-purple-600 uppercase mb-2 tracking-widest">Métrica RMS</p>
-                    <p class="text-[11px] text-slate-500 italic">Análisis de potencia muscular.</p>
+                    <p class="text-[10px] font-black text-purple-600 uppercase mb-2 tracking-widest">RMS</p>
+                    <p class="text-[11px] text-slate-500 italic">Potencia de la señal muscular.</p>
                 </div>
                 <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
-                    <p class="text-[10px] font-black text-cyan-600 uppercase mb-2 tracking-widest">Métrica ARV</p>
-                    <p class="text-[11px] text-slate-500 italic">Integración del área bajo la curva.</p>
+                    <p class="text-[10px] font-black text-cyan-600 uppercase mb-2 tracking-widest">ARV</p>
+                    <p class="text-[11px] text-slate-500 italic">Área bajo la curva rectificada.</p>
                 </div>
             </div>
 
-            <button onclick="openControlPopup()" class="w-full bg-blue-600 p-8 rounded-[32px] text-white shadow-2xl shadow-blue-100 flex justify-between items-center hover:scale-[1.01] transition-transform">
+            <button onclick="openControlPopup()" class="w-full bg-blue-600 p-8 rounded-[32px] text-white shadow-2xl flex justify-between items-center hover:scale-[1.01] transition-transform">
                 <div class="text-left">
-                    <h3 class="text-xl font-bold italic uppercase tracking-tighter">Nueva Sesión Clínica</h3>
-                    <p class="text-sm opacity-80 font-medium">Inicia el registro con marcado automático de repeticiones.</p>
+                    <h3 class="text-xl font-bold italic uppercase tracking-tighter">Nueva Sesión</h3>
+                    <p class="text-sm opacity-80 font-medium">Inicia el registro con tabla de tiempos lateral.</p>
                 </div>
-                <span class="bg-white text-blue-600 px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest shadow-sm">Configurar</span>
+                <span class="bg-white text-blue-600 px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest">Comenzar</span>
             </button>
         </div>
 
@@ -69,53 +70,54 @@
                 <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 text-center">
                     <h3 class="text-[10px] font-black text-slate-400 uppercase mb-4 tracking-widest">Repeticiones</h3>
                     <p id="main-counter" class="text-8xl font-light text-blue-600 transition-all duration-200">0</p>
-                    <div class="w-full bg-slate-50 h-3 rounded-full mt-6 overflow-hidden border border-slate-100">
+                    <div class="w-full bg-slate-50 h-2 rounded-full mt-6 overflow-hidden">
                         <div id="global-progress" class="bg-blue-600 h-full w-0 transition-all duration-700"></div>
                     </div>
-                    <p class="text-[8px] font-bold text-red-400 mt-4 uppercase italic tracking-tighter">* Umbral de registro activo (>60 uV)</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 space-y-3">
+                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Log de Eventos</h3>
+                    <div class="max-h-40 overflow-y-auto pr-2" id="rep-table-body">
+                        <table class="w-full text-[10px] text-left">
+                            <thead class="sticky top-0 bg-white border-b border-slate-100">
+                                <tr>
+                                    <th class="py-2 font-black text-slate-400 uppercase">Rep.</th>
+                                    <th class="py-2 font-black text-slate-400 uppercase text-right">Tiempo</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-entries" class="divide-y divide-slate-50">
+                                </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 space-y-3">
                     <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Información (Opcional)</h3>
-                    <input type="text" id="paciente-id" placeholder="Nombre o ID Paciente" class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] italic focus:ring-2 focus:ring-blue-500/20 outline-none transition-all">
-                    <input type="text" id="doctor-id" placeholder="Médico / Investigador" class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] italic focus:ring-2 focus:ring-blue-500/20 outline-none transition-all">
+                    <input type="text" id="paciente-id" placeholder="ID Paciente" class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] italic outline-none">
+                    <input type="text" id="doctor-id" placeholder="Médico" class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] italic outline-none">
                 </div>
 
                 <div class="space-y-2">
-                    <button id="btn-download" onclick="descargarCSV()" class="w-full py-4 bg-emerald-500 text-white rounded-2xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-emerald-100 hover:bg-emerald-600 transition-all">
-                        Descargar Reporte (.CSV) ⤓
-                    </button>
-                    <button onclick="requestReset()" class="w-full py-4 border-2 border-dashed border-slate-200 rounded-2xl text-[9px] font-black text-slate-400 hover:text-blue-600 hover:border-blue-200 transition-all uppercase tracking-widest">
-                        Reiniciar Lectura ↺
-                    </button>
-                    <button onclick="salirDeLectura()" class="w-full py-4 bg-slate-100 rounded-2xl text-[9px] font-black text-slate-500 hover:bg-red-50 hover:text-red-600 transition-all uppercase flex items-center justify-center gap-2">
-                        Finalizar Sesión
-                    </button>
+                    <button onclick="descargarCSV()" class="w-full py-4 bg-emerald-500 text-white rounded-2xl text-[9px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-50">Exportar CSV ⤓</button>
+                    <button onclick="location.reload()" class="w-full py-4 border-2 border-dashed border-slate-200 rounded-2xl text-[9px] font-black text-slate-400 hover:text-blue-600 transition-all uppercase tracking-widest">Reiniciar ↺</button>
+                    <button onclick="location.reload()" class="w-full py-4 bg-slate-100 rounded-2xl text-[9px] font-black text-slate-500 hover:text-red-600 transition-all uppercase">Finalizar</button>
                 </div>
             </div>
 
             <div class="lg:col-span-9 space-y-6">
                 <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
-                    <h3 class="text-[10px] font-black text-slate-400 uppercase mb-4 tracking-widest italic">Señal Cruda (uV) + Timestamps de Repetición</h3>
-                    <div class="h-80"><canvas id="rawChart"></canvas></div>
+                    <h3 class="text-[10px] font-black text-slate-400 uppercase mb-4 tracking-widest italic">Señal Cruda + Umbral 60%</h3>
+                    <div class="h-96"><canvas id="rawChart"></canvas></div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 h-64 flex flex-col">
-                        <h3 class="text-[10px] font-black text-purple-600 uppercase mb-4 tracking-widest italic">Métrica RMS</h3>
-                        <div id="container-rms-chart" class="flex-1"><canvas id="rmsChart"></canvas></div>
-                        <div id="result-rms" class="hidden flex-1 flex flex-col justify-center items-center">
-                            <span id="value-rms" class="text-7xl font-light text-purple-600">0.00</span>
-                            <span class="text-[10px] font-bold text-slate-400 uppercase mt-2 italic tracking-widest">uV Final</span>
-                        </div>
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 h-64 flex flex-col items-center justify-center text-center">
+                        <h3 class="text-[10px] font-black text-purple-600 uppercase mb-4 tracking-widest">RMS Final</h3>
+                        <div id="result-rms" class="text-7xl font-light text-purple-600">--</div>
                     </div>
-                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 h-64 flex flex-col">
-                        <h3 class="text-[10px] font-black text-cyan-600 uppercase mb-4 tracking-widest italic">Métrica ARV</h3>
-                        <div id="container-arv-chart" class="flex-1"><canvas id="arsChart"></canvas></div>
-                        <div id="result-arv" class="hidden flex-1 flex flex-col justify-center items-center">
-                            <span id="value-arv" class="text-7xl font-light text-cyan-600">0.00</span>
-                            <span class="text-[10px] font-bold text-slate-400 uppercase mt-2 italic tracking-widest">uV Final</span>
-                        </div>
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 h-64 flex flex-col items-center justify-center text-center">
+                        <h3 class="text-[10px] font-black text-cyan-600 uppercase mb-4 tracking-widest">ARV Final</h3>
+                        <div id="result-arv" class="text-7xl font-light text-cyan-600">--</div>
                     </div>
                 </div>
             </div>
@@ -123,22 +125,19 @@
     </main>
 
     <div id="controlPopup" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-        <div class="bg-white max-w-lg w-full rounded-[40px] shadow-2xl p-12 animate-fade-in">
-            <h2 class="text-3xl font-light text-slate-800 mb-8 italic">Protocolo de <strong>Seguridad</strong></h2>
+        <div class="bg-white max-w-lg w-full rounded-[40px] shadow-2xl p-12">
+            <h2 class="text-3xl font-light text-slate-800 mb-8 italic">Checklist <strong>Médico</strong></h2>
             <div class="space-y-4 mb-10">
-                <label class="flex items-center gap-4 p-5 border border-slate-100 rounded-2xl cursor-pointer hover:bg-slate-50 transition-all">
+                <label class="flex items-center gap-4 p-5 border border-slate-100 rounded-2xl cursor-pointer hover:bg-slate-50 transition">
                     <input type="checkbox" class="step-check w-5 h-5 accent-blue-600">
-                    <span class="text-sm text-slate-600 italic font-medium">Sensores fijados en vientre muscular</span>
+                    <span class="text-sm text-slate-600 italic">Electrodos colocados</span>
                 </label>
-                <label class="flex items-center gap-4 p-5 border border-slate-100 rounded-2xl cursor-pointer hover:bg-slate-50 transition-all">
+                <label class="flex items-center gap-4 p-5 border border-slate-100 rounded-2xl cursor-pointer hover:bg-slate-50 transition">
                     <input type="checkbox" class="step-check w-5 h-5 accent-blue-600">
-                    <span class="text-sm text-slate-600 italic font-medium">Electrodo de referencia en zona neutra</span>
+                    <span class="text-sm text-slate-600 italic">Referencia conectada</span>
                 </label>
             </div>
-            <div class="flex gap-4">
-                <button onclick="closeControlPopup()" class="flex-1 py-4 text-[10px] font-black uppercase text-slate-400 hover:text-slate-600 transition">Cancelar</button>
-                <button id="btn-start-global" disabled onclick="startGlobalSession()" class="flex-[2] bg-slate-200 text-slate-400 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all">Empezar Registro</button>
-            </div>
+            <button id="btn-start-global" disabled onclick="startGlobalSession()" class="w-full bg-slate-200 text-slate-400 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all">Iniciar Lectura</button>
         </div>
     </div>
 
@@ -148,23 +147,11 @@
         let allRawData = []; 
         let canCountRep = true;
 
-        // Estructura para las anotaciones dinámicas (Timestamps)
         const annotationsConfig = {
             thresholdLine: {
-                type: 'line',
-                yMin: 60,
-                yMax: 60,
-                borderColor: 'rgba(239, 68, 68, 0.4)',
-                borderWidth: 3,
-                borderDash: [5, 5],
-                label: {
-                    display: true,
-                    content: 'UMBRAL 60%',
-                    position: 'end',
-                    backgroundColor: 'rgba(239, 68, 68, 0.8)',
-                    color: 'white',
-                    font: { size: 10, weight: 'bold' }
-                }
+                type: 'line', yMin: 60, yMax: 60,
+                borderColor: 'rgba(239, 68, 68, 0.4)', borderWidth: 3, borderDash: [5, 5],
+                label: { display: true, content: 'UMBRAL 60%', position: 'end', backgroundColor: 'rgba(239, 68, 68, 0.8)', color: 'white', font: { size: 10, weight: 'bold' } }
             }
         };
 
@@ -175,82 +162,20 @@
             closeControlPopup();
             document.getElementById('vista-info').classList.add('hidden');
             document.getElementById('vista-monitor').classList.remove('hidden');
-            document.getElementById('global-status-bar').classList.replace('bg-slate-100', 'bg-emerald-500');
-            document.getElementById('status-text').innerText = "● REGISTRO CLÍNICO EN PROCESO";
-            document.getElementById('status-text').classList.replace('text-slate-500', 'text-white');
             isRecording = true;
         }
-
-        function salirDeLectura() {
-            if(confirm("¿Deseas finalizar la sesión y descartar los datos no guardados?")) { location.reload(); }
-        }
-
-        function descargarCSV() {
-            const paciente = document.getElementById('paciente-id').value || "No_Identificado";
-            const doctor = document.getElementById('doctor-id').value || "Especialista";
-            const fecha = new Date().toLocaleDateString().replace(/\//g, '-');
-            
-            let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += `Reporte sEMG\n`;
-            csvContent += `Paciente: ${paciente}, Profesional: ${doctor}, Fecha: ${fecha}\n\n`;
-            csvContent += "Timestamp, Amplitud (uV)\n";
-
-            allRawData.forEach(row => {
-                csvContent += `${row.t},${row.v}\n`;
-            });
-
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `Reporte_sEMG_${paciente}.csv`);
-            document.body.appendChild(link);
-            link.click();
-        }
-
-        const checks = document.querySelectorAll('.step-check');
-        const startBtn = document.getElementById('btn-start-global');
-        checks.forEach(c => c.addEventListener('change', () => {
-            const allChecked = Array.from(checks).every(i => i.checked);
-            startBtn.disabled = !allChecked;
-            startBtn.className = allChecked ? "flex-[2] bg-blue-600 text-white py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-100" : "flex-[2] bg-slate-200 text-slate-400 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest";
-        }));
-
-        // CONFIGURACIÓN DE GRÁFICAS
-        const baseConfig = (color) => ({
-            type: 'line',
-            data: { labels: [], datasets: [{ data: [], borderColor: color, borderWidth: 2, pointRadius: 0, fill: false, tension: 0.4 }] },
-            options: { 
-                responsive: true, 
-                maintainAspectRatio: false, 
-                plugins: { legend: { display: false } }, 
-                scales: { x: { display: false }, y: { beginAtZero: true, grid: { color: '#f1f5f9' } } } 
-            }
-        });
 
         const rawChartCtx = document.getElementById('rawChart').getContext('2d');
         const rawChart = new Chart(rawChartCtx, {
             type: 'line',
             data: { labels: [], datasets: [{ data: [], borderColor: '#2563eb', borderWidth: 2, pointRadius: 0, fill: false, tension: 0.4 }] },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    annotation: {
-                        annotations: annotationsConfig
-                    }
-                },
-                scales: { 
-                    x: { display: false }, 
-                    y: { min: 0, max: 100, grid: { color: '#f1f5f9' } } 
-                }
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false }, annotation: { annotations: annotationsConfig } },
+                scales: { x: { display: false }, y: { min: 0, max: 100, grid: { color: '#f1f5f9' } } }
             }
         });
 
-        const rmsChart = new Chart(document.getElementById('rmsChart').getContext('2d'), baseConfig('#9333ea'));
-        const arsChart = new Chart(document.getElementById('arsChart').getContext('2d'), baseConfig('#0891b2'));
-
-        // Lógica de Repeticiones y Timestamps
         setInterval(() => {
             if (!isRecording) return;
             
@@ -258,74 +183,72 @@
             const time = new Date().toLocaleTimeString('es-MX', { hour12: false });
             allRawData.push({ t: time, v: rawVal.toFixed(2) });
 
-            [rawChart, rmsChart, arsChart].forEach((chart, i) => {
-                const val = [rawVal, rawVal*0.7, rawVal*0.4][i];
-                if (chart.data.labels.length > 40 && count < 10) { 
-                    chart.data.labels.shift(); 
-                    chart.data.datasets[0].data.shift(); 
+            if (rawChart.data.labels.length > 50) {
+                rawChart.data.labels.shift();
+                rawChart.data.datasets[0].data.shift();
+            }
+            rawChart.data.labels.push(time);
+            rawChart.data.datasets[0].data.push(rawVal);
+            rawChart.update('none');
+
+            // LÓGICA DE DETECCIÓN
+            if(rawVal > 60 && canCountRep && count < 10) {
+                count++;
+                canCountRep = false;
+                
+                document.getElementById('main-counter').innerText = count;
+                document.getElementById('global-progress').style.width = (count * 10) + "%";
+
+                // 1. Marca en Gráfica (Solo R#)
+                rawChart.options.plugins.annotation.annotations['rep' + count] = {
+                    type: 'line', xMin: rawChart.data.labels.length - 1, xMax: rawChart.data.labels.length - 1,
+                    borderColor: '#2563eb', borderWidth: 2,
+                    label: { display: true, content: 'R' + count, position: 'start', backgroundColor: '#2563eb', color: 'white', font: { size: 10, weight: 'bold' } }
+                };
+
+                // 2. Fila en Tabla
+                const tableBody = document.getElementById('table-entries');
+                const row = `<tr class="animate-fade-in"><td class="py-2 font-bold text-slate-700 italic">R${count}</td><td class="py-2 text-right font-mono text-blue-600">${time}</td></tr>`;
+                tableBody.innerHTML = row + tableBody.innerHTML;
+
+                if(count === 10) { 
+                    isRecording = false; 
+                    finalizarSession();
                 }
-                chart.data.labels.push(time);
-                chart.data.datasets[0].data.push(val);
-                chart.update('none');
-            });
-
-            // DETECCIÓN DE CONTRACCIÓN (Umbral 60%)
-            if(rawVal > 60) {
-                if(canCountRep && count < 10) {
-                    count++;
-                    const counterEl = document.getElementById('main-counter');
-                    counterEl.innerText = count;
-                    document.getElementById('global-progress').style.width = (count * 10) + "%";
-                    
-                    // AGREGAR TIMESTAMP VISUAL EN LA GRÁFICA
-                    const repId = 'rep' + count;
-                    rawChart.options.plugins.annotation.annotations[repId] = {
-                        type: 'line',
-                        xMin: rawChart.data.labels.length - 1,
-                        xMax: rawChart.data.labels.length - 1,
-                        borderColor: 'rgba(37, 99, 235, 0.5)',
-                        borderWidth: 2,
-                        label: {
-                            display: true,
-                            content: `R${count} - ${time}`,
-                            position: 'start',
-                            backgroundColor: 'rgba(37, 99, 235, 0.8)',
-                            color: 'white',
-                            font: { size: 9, weight: 'bold' },
-                            yAdjust: -20
-                        }
-                    };
-
-                    canCountRep = false; 
-                    counterEl.classList.add('scale-110', 'text-emerald-500');
-                    setTimeout(() => counterEl.classList.remove('scale-110', 'text-emerald-500'), 300);
-
-                    if(count === 10) { 
-                        isRecording = false; 
-                        finalizarProtocoloMatematico(); 
-                    }
-                }
-            } else if (rawVal < 25) {
+            } else if (rawVal < 30) {
                 canCountRep = true; 
             }
         }, 800);
 
-        function finalizarProtocoloMatematico() {
+        function finalizarSession() {
             const dataVals = allRawData.map(d => parseFloat(d.v));
             const n = dataVals.length;
             const rms = Math.sqrt(dataVals.reduce((sum, v) => sum + v*v, 0) / n);
             const arv = dataVals.reduce((sum, v) => sum + Math.abs(v), 0) / n;
-
-            document.getElementById('container-rms-chart').classList.add('hidden');
-            document.getElementById('container-arv-chart').classList.add('hidden');
-            document.getElementById('result-rms').classList.remove('hidden');
-            document.getElementById('result-arv').classList.remove('hidden');
-            document.getElementById('value-rms').innerText = rms.toFixed(2);
-            document.getElementById('value-arv').innerText = arv.toFixed(2);
-            document.getElementById('status-text').innerText = "✓ SESIÓN FINALIZADA CORRECTAMENTE";
+            document.getElementById('result-rms').innerText = rms.toFixed(2);
+            document.getElementById('result-arv').innerText = arv.toFixed(2);
         }
 
-        function requestReset() { location.reload(); }
+        function descargarCSV() {
+            const pac = document.getElementById('paciente-id').value || "Paciente";
+            let csv = "data:text/csv;charset=utf-8,Repeticion,Timestamp\n";
+            document.querySelectorAll('#table-entries tr').forEach(tr => {
+                const tds = tr.querySelectorAll('td');
+                csv += `${tds[0].innerText},${tds[1].innerText}\n`;
+            });
+            const link = document.createElement("a");
+            link.setAttribute("href", encodeURI(csv));
+            link.setAttribute("download", `sEMG_${pac}.csv`);
+            link.click();
+        }
+
+        const checks = document.querySelectorAll('.step-check');
+        checks.forEach(c => c.addEventListener('change', () => {
+            const allChecked = Array.from(checks).every(i => i.checked);
+            const btn = document.getElementById('btn-start-global');
+            btn.disabled = !allChecked;
+            btn.className = allChecked ? "w-full bg-blue-600 text-white py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg" : "w-full bg-slate-200 text-slate-400 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest";
+        }));
     </script>
 </body>
 </html>
