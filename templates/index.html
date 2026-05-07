@@ -12,6 +12,8 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         #rep-table-body::-webkit-scrollbar { width: 4px; }
         #rep-table-body::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        /* Clase personalizada para el Baby Pink */
+        .bg-baby-pink { background-color: #feb9cf; }
     </style>
 </head>
 <body class="bg-[#F8FAFC] text-slate-900 font-sans">
@@ -142,7 +144,7 @@
         let count = 0;
         let allRawLabels = []; 
         let allRawValues = []; 
-        let repMarkerIndices = []; // Para guardar en qué índice ocurrió cada rep
+        let repMarkerIndices = []; 
         let canCountRep = true;
 
         const annotationsConfig = {
@@ -160,8 +162,8 @@
             closeControlPopup();
             document.getElementById('vista-info').classList.add('hidden');
             document.getElementById('vista-monitor').classList.remove('hidden');
-            // CAMBIO 1: Color Rosa para Registro en Vivo
-            document.getElementById('global-status-bar').classList.replace('bg-slate-100', 'bg-pink-500');
+            // CAMBIO: Baby Pink #feb9cf
+            document.getElementById('global-status-bar').style.backgroundColor = "#feb9cf";
             document.getElementById('status-text').innerText = "● REGISTRO EN VIVO";
             document.getElementById('status-text').classList.replace('text-slate-500', 'text-white');
             isRecording = true;
@@ -196,9 +198,11 @@
                 responsive: true, maintainAspectRatio: false,
                 plugins: { legend: { display: false }, annotation: { annotations: annotationsConfig } },
                 scales: { 
-                    // CAMBIO 2: Ejes con unidades
                     x: { 
-                        display: false,
+                        display: true,
+                        // CAMBIO: Quitar timestamps (labels), dejar solo título de eje
+                        ticks: { display: false },
+                        grid: { display: false },
                         title: { display: true, text: 'Tiempo (ms)', font: { size: 10, weight: 'bold' } }
                     }, 
                     y: { 
@@ -232,11 +236,10 @@
             if(rawVal > 60 && canCountRep && count < 10) {
                 count++;
                 canCountRep = false;
-                repMarkerIndices.push(allRawValues.length - 1); // Guardar índice global
+                repMarkerIndices.push(allRawValues.length - 1); 
                 document.getElementById('main-counter').innerText = count;
                 document.getElementById('global-progress').style.width = (count * 10) + "%";
                 
-                // Marcador en tiempo real
                 rawChart.data.datasets[1].data[rawChart.data.datasets[1].data.length - 1] = rawVal;
 
                 const tableBody = document.getElementById('table-entries');
@@ -254,21 +257,18 @@
         }, 150);
 
         function finalizarYExpandirGrafica() {
-            document.getElementById('global-status-bar').classList.replace('bg-pink-500', 'bg-blue-500');
+            document.getElementById('global-status-bar').style.backgroundColor = "#10b981"; // Cambia a esmeralda al finalizar
             document.getElementById('status-text').innerText = "✓ ANÁLISIS COMPLETADO";
             document.getElementById('chart-title').innerText = "VISTA COMPLETA DE LA SESIÓN (10 REPS)";
             
             rawChart.data.labels = allRawLabels;
             rawChart.data.datasets[0].data = allRawValues;
             
-            // CAMBIO 3: Indicar puntos de repeticiones al finalizar
             let finalMarkers = new Array(allRawValues.length).fill(null);
             repMarkerIndices.forEach(idx => {
                 finalMarkers[idx] = allRawValues[idx];
             });
             rawChart.data.datasets[1].data = finalMarkers;
-
-            rawChart.options.scales.x.display = true; 
             rawChart.update();
 
             const n = allRawValues.length;
@@ -280,7 +280,7 @@
         }
 
         function requestReset() {
-            if (confirm("¿Estás seguro de que deseas reiniciar la sesión actual? Se borrarán todos los datos registrados.")) {
+            if (confirm("¿Estás seguro de que deseas reiniciar la sesión actual?")) {
                 count = 0;
                 allRawLabels = [];
                 allRawValues = [];
@@ -295,14 +295,13 @@
                 document.getElementById('value-arv').innerText = "--";
                 document.getElementById('chart-title').innerText = "Señal RAW en Tiempo Real";
                 
-                document.getElementById('global-status-bar').className = "bg-pink-500 border-b border-slate-200 py-2 px-8 flex justify-center items-center gap-4 transition-all duration-500";
+                document.getElementById('global-status-bar').style.backgroundColor = "#feb9cf";
                 document.getElementById('status-text').innerText = "● REGISTRO EN VIVO";
                 document.getElementById('status-text').className = "text-[9px] font-bold uppercase tracking-widest text-white italic text-center";
 
                 rawChart.data.labels = [];
                 rawChart.data.datasets[0].data = [];
                 rawChart.data.datasets[1].data = [];
-                rawChart.options.scales.x.display = false;
                 rawChart.update();
             }
         }
