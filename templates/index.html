@@ -246,6 +246,8 @@
 
         function finalizarYExpandirGrafica() {
             // Cambiar estado visual
+            
+            document.getElementById('global-status-bar').classList.replace('bg-slate-100', 'bg-blue-500');
             document.getElementById('status-text').innerText = "✓ ANÁLISIS COMPLETADO";
             document.getElementById('chart-title').innerText = "VISTA COMPLETA DE LA SESIÓN (10 REPS)";
             
