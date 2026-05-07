@@ -1,13 +1,12 @@
-from flask import Flask, render_template, request, jsonify, send_file
+from flask import Flask, render_template, request, jsonify, send_file, redirect, url_for, flash
 import csv
 import os
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from datetime import datetime
 
 app = Flask(__name__)
 CSV_FILE = 'datos_pacientes.csv'
-@app.route('/')
-def home():
-    return render_template('index.html')
+
 @app.route('/prototipo')
 def prototipo():
     return render_template('prototipo.html')
