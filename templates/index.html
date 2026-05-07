@@ -7,204 +7,66 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+    <style>
+        .transition-blur { transition: filter 0.7s ease, opacity 0.7s ease; }
+    </style>
 </head>
 <body class="bg-[#F4F7F9] text-slate-900 font-sans overflow-hidden">
 
-    <div id="overlay-preparacion" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/80 backdrop-blur-md p-4 transition-opacity duration-700">
-        <div class="bg-white max-w-4xl w-full rounded-3xl shadow-2xl overflow-hidden flex flex-col md:row">
-            <div class="p-10 md:w-1/2 bg-slate-50">
+    <div id="overlay-preparacion" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/80 backdrop-blur-md p-4">
+        <div class="bg-white max-w-4xl w-full rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
+            
+            <div class="p-10 md:w-1/2 bg-slate-50 border-r border-gray-100">
                 <div class="mb-8">
-                    <span class="text-[10px] bg-blue-100 text-blue-600 px-3 py-1 rounded-full font-black uppercase tracking-widest">Protocolo sEMG</span>
-                    <h2 class="text-3xl font-light text-slate-800 mt-4 leading-tight">Estación de <br><strong>Preparación</strong></h2>
+                    <span class="text-[10px] bg-blue-100 text-blue-600 px-3 py-1 rounded-full font-black uppercase tracking-widest">Protocolo de Seguridad</span>
+                    <h2 class="text-3xl font-light text-slate-800 mt-4 leading-tight italic">Estación de <br><strong>Preparación</strong></h2>
                 </div>
                 
                 <div class="space-y-4 text-sm text-slate-600 leading-relaxed">
-                    <p>Bienvenido. Este protocolo consiste en la captura de <strong>10 repeticiones</strong> de contracción muscular máxima voluntaria.</p>
-                    <p>El sistema registrará las métricas de potencia y área (RMS/ARV) para su análisis posterior en el expediente.</p>
-                    <div class="p-4 bg-blue-50 border-l-4 border-blue-400 rounded-r-lg">
-                        <p class="text-[11px] text-blue-800 italic font-medium">Aviso: Esta es una herramienta de acompañamiento tecnológico, no emite diagnósticos médicos.</p>
+                    <p>Bienvenido. Antes de iniciar la visualización, es imperativo asegurar la calidad de la señal sEMG.</p>
+                    <p>Este sistema registrará <strong>10 repeticiones</strong> de contracción una vez que usted active el modo de registro en el monitor principal.</p>
+                    <div class="p-4 bg-blue-50 border-l-4 border-blue-400 rounded-r-lg mt-6">
+                        <p class="text-[11px] text-blue-800 font-medium uppercase italic tracking-tighter">Herramienta de acompañamiento médico. No emite diagnósticos.</p>
                     </div>
                 </div>
             </div>
 
             <div class="p-10 md:w-1/2 flex flex-col justify-center bg-white">
-                <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-8">Validación de Seguridad</h3>
+                <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-8">Validación de Hardware</h3>
                 
                 <div class="space-y-6 mb-10">
                     <label class="flex items-center gap-4 group cursor-pointer">
-                        <input type="checkbox" class="check-protocolo w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                        <span class="text-sm text-slate-700 group-hover:text-black transition">Piel limpia y libre de vello/aceites</span>
+                        <input type="checkbox" class="check-protocolo w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 transition-all">
+                        <span class="text-xs text-slate-700 group-hover:text-black">Piel limpia y preparada (alcohol)</span>
                     </label>
                     <label class="flex items-center gap-4 group cursor-pointer">
-                        <input type="checkbox" class="check-protocolo w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                        <span class="text-sm text-slate-700 group-hover:text-black transition">Electrodos sobre el vientre muscular</span>
+                        <input type="checkbox" class="check-protocolo w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 transition-all">
+                        <span class="text-xs text-slate-700 group-hover:text-black">Electrodos en el vientre del músculo</span>
                     </label>
                     <label class="flex items-center gap-4 group cursor-pointer">
-                        <input type="checkbox" class="check-protocolo w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                        <span class="text-sm text-slate-700 group-hover:text-black transition">Electrodo de tierra en zona ósea</span>
+                        <input type="checkbox" class="check-protocolo w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 transition-all">
+                        <span class="text-xs text-slate-700 group-hover:text-black">Electrodo de referencia (tierra) en hueso</span>
                     </label>
                 </div>
 
-                <button id="btn-iniciar-sesion" disabled class="w-full bg-slate-200 text-slate-400 py-4 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] transition-all duration-300">
-                    Iniciar Monitor
+                <button id="btn-validar" disabled class="w-full bg-slate-200 text-slate-400 py-4 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300">
+                    Validar y Entrar al Monitor
                 </button>
             </div>
         </div>
     </div>
 
-    <div id="contenido-monitor" class="blur-md pointer-events-none transition-all duration-700 h-screen flex flex-col">
+    <div id="contenido-monitor" class="blur-md opacity-50 pointer-events-none transition-blur h-screen flex flex-col">
         
         <nav class="bg-white border-b border-gray-200 py-4 px-8 flex justify-between items-center shadow-sm">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">sEMG</div>
-                <h1 class="text-xl font-bold tracking-tighter text-slate-800 uppercase">Sistema de Monitoreo</h1>
+                <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold shadow-lg shadow-blue-100">sEMG</div>
+                <h1 class="text-xl font-bold tracking-tighter text-slate-800 uppercase italic">Monitor Clínico</h1>
             </div>
-            <div class="space-x-8 text-xs font-bold uppercase tracking-widest flex items-center">
+            <div class="space-x-8 text-[10px] font-black uppercase tracking-widest flex items-center">
                 <a href="/" class="text-blue-600 border-b-2 border-blue-600 pb-1">Monitor</a>
-                <a href="/prototipo" class="hover:text-blue-600 transition text-slate-400">Prototipo</a>
-                <a href="{{ url_for('logout') }}" class="bg-red-50 text-red-500 px-4 py-2 rounded-full hover:bg-red-500 hover:text-white transition-all">Log Out</a>
+                <a href="{{ url_for('logout') }}" class="text-red-400 hover:text-red-600 transition-all">Cerrar Sesión</a>
             </div>
         </nav>
 
-        <main class="max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 overflow-y-auto">
-            
-            <div class="lg:col-span-3 space-y-6">
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Contador de Contracciones</h3>
-                    <p id="cont-contracciones" class="text-6xl font-light text-blue-700">0</p>
-                    <p class="text-[10px] text-gray-400 mt-2 italic">* Meta: 10 Repeticiones</p>
-                </div>
-
-                <div class="bg-slate-900 p-6 rounded-xl text-white shadow-xl">
-                    <h3 class="text-[10px] font-bold text-blue-400 uppercase mb-4">Información de Sesión</h3>
-                    <button onclick="openModal()" class="w-full py-3 border border-white/20 text-[10px] font-bold uppercase tracking-widest hover:bg-white hover:text-slate-900 transition mb-3">
-                        ¿Qué es RMS y ARS?
-                    </button>
-                    <a href="/descargar_csv" class="block w-full text-center bg-blue-600 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-blue-700 transition">
-                        Exportar Reporte
-                    </a>
-                </div>
-            </div>
-
-            <div class="lg:col-span-9 space-y-6">
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 class="text-xs font-bold text-slate-400 uppercase mb-4">Señal RAW (Microvoltaje) + Umbral 60%</h3>
-                    <div class="h-64"><canvas id="rawChart"></canvas></div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <h3 class="text-xs font-bold text-slate-400 uppercase mb-4">Procesamiento RMS</h3>
-                        <div class="h-48"><canvas id="rmsChart"></canvas></div>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <h3 class="text-xs font-bold text-slate-400 uppercase mb-4">Procesamiento ARS</h3>
-                        <div class="h-48"><canvas id="arsChart"></canvas></div>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <div id="infoModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[150] flex items-center justify-center p-4">
-        <div class="bg-white max-w-md w-full rounded-2xl p-8 shadow-2xl">
-            <h2 class="text-2xl font-bold text-slate-900 mb-4">Glosario Clínico</h2>
-            <div class="space-y-4 text-sm text-slate-600 leading-relaxed">
-                <p><strong>RMS (Root Mean Square):</strong> Representa la potencia media de la señal eléctrica muscular.</p>
-                <hr>
-                <p><strong>ARS (Average Rectified Value):</strong> Indica el promedio de la señal rectificada, útil para medir el volumen de activación.</p>
-            </div>
-            <button onclick="closeModal()" class="mt-8 w-full bg-blue-600 text-white font-bold py-3 rounded-xl uppercase text-xs tracking-widest hover:bg-blue-700 transition">Cerrar</button>
-        </div>
-    </div>
-
-    <script>
-        // --- LÓGICA DE LA ESTACIÓN DE PREPARACIÓN ---
-        const checkboxes = document.querySelectorAll('.check-protocolo');
-        const btnIniciar = document.getElementById('btn-iniciar-sesion');
-        const overlay = document.getElementById('overlay-preparacion');
-        const monitor = document.getElementById('contenido-monitor');
-
-        checkboxes.forEach(check => {
-            check.addEventListener('change', () => {
-                const todosMarcados = Array.from(checkboxes).every(c => c.checked);
-                btnIniciar.disabled = !todosMarcados;
-                if (todosMarcados) {
-                    btnIniciar.classList.replace('bg-slate-200', 'bg-blue-600');
-                    btnIniciar.classList.replace('text-slate-400', 'text-white');
-                } else {
-                    btnIniciar.classList.replace('bg-blue-600', 'bg-slate-200');
-                    btnIniciar.classList.replace('text-white', 'text-slate-400');
-                }
-            });
-        });
-
-        btnIniciar.addEventListener('click', () => {
-            overlay.style.opacity = '0';
-            setTimeout(() => {
-                overlay.style.display = 'none';
-                monitor.classList.remove('blur-md', 'pointer-events-none');
-                document.body.classList.remove('overflow-hidden');
-                medicionActiva = true;
-            }, 700);
-        });
-
-        // --- LÓGICA DE MONITOREO Y GRÁFICAS ---
-        let cont = 0;
-        let sobreUmbral = false;
-        let medicionActiva = false; 
-        const UMBRAL = 60;
-
-        const chartConfig = (color, label) => ({
-            type: 'line',
-            data: { labels: [], datasets: [{ label, data: [], borderColor: color, borderWidth: 1.5, pointRadius: 0, fill: false, tension: 0.4 }] },
-            options: { responsive: true, maintainAspectRatio: false, scales: { x: { display: false }, y: { beginAtZero: true } } }
-        });
-
-        const rawChart = new Chart(document.getElementById('rawChart').getContext('2d'), chartConfig('#8a2527', 'Señal Raw'));
-        const rmsChart = new Chart(document.getElementById('rmsChart').getContext('2d'), chartConfig('#d25cd6', 'RMS'));
-        const arsChart = new Chart(document.getElementById('arsChart').getContext('2d'), chartConfig('#408cc7', 'ARS'));
-
-        rawChart.options.plugins = {
-            annotation: {
-                annotations: {
-                    line1: { type: 'line', yMin: UMBRAL, yMax: UMBRAL, borderColor: 'rgba(239, 68, 68, 0.5)', borderWidth: 2, borderDash: [5, 5] }
-                }
-            }
-        };
-
-        function updateUI(raw, rms, ars) {
-            if (!medicionActiva) return;
-
-            const time = new Date().toLocaleTimeString();
-
-            if (raw > UMBRAL && !sobreUmbral) {
-                cont++;
-                sobreUmbral = true;
-                document.getElementById('cont-contracciones').innerText = cont;
-                if(cont === 10) alert("¡Protocolo de 10 repeticiones completado!");
-            } else if (raw < UMBRAL) {
-                sobreUmbral = false;
-            }
-
-            [rawChart, rmsChart, arsChart].forEach((chart, i) => {
-                const val = [raw, rms, ars][i];
-                if (chart.data.labels.length > 20) { chart.data.labels.shift(); chart.data.datasets[0].data.shift(); }
-                chart.data.labels.push(time);
-                chart.data.datasets[0].data.push(val);
-                chart.update('none');
-            });
-        }
-
-        setInterval(() => {
-            if(medicionActiva) {
-                const r = Math.random() * 100;
-                updateUI(r.toFixed(1), (r*0.7).toFixed(1), (r*0.5).toFixed(1));
-            }
-        }, 1000);
-
-        function openModal() { document.getElementById('infoModal').classList.remove('hidden'); }
-        function closeModal() { document.getElementById('infoModal').classList.add('hidden'); }
-    </script>
-</body>
-</html>
+        <main class="max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 overflow-y-auto w
