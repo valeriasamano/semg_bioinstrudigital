@@ -3,78 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proyecto de Bioinstrumentación Digital</title>
+    <title>sEMG Monitor - Clinical Interface</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="bg-gray-50 font-sans">
+<body class="bg-[#F8F9FA] font-sans text-slate-800">
 
-    <div class="max-w-4xl mx-auto p-4 md:p-8">
-        <header class="mb-8 text-center md:text-left">
-            <h1 class="text-3xl font-bold text-slate-1000">Panel de Monitoreo Clínico</h1>
-            <p class="text-slate-700">Visualización de mediciones fisiológicas en tiempo real</p>
+    <div class="bg-white border-b border-gray-200 py-4 px-6 mb-6">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xs">sEMG</div>
+                <span class="font-bold tracking-tight text-lg uppercase text-slate-900">BioInstrumentation Lab</span>
+            </div>
+            <span class="text-xs font-medium text-gray-400 uppercase tracking-widest">Atrofia Muscular / UCI</span>
+        </div>
+    </div>
+
+    <div class="max-w-5xl mx-auto p-4 md:p-8">
+        
+        <header class="mb-12 border-l-4 border-blue-600 pl-6">
+            <h1 class="text-5xl font-light text-slate-900 tracking-tight mb-2">Monitor Clínico de Superficie</h1>
+            <p class="text-lg text-slate-500 font-normal">Prevención de atrofia muscular en pacientes críticos intubados.</p>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <h3 class="text-sm font-semibold text-gray-400 uppercase">Último Valor Recibido</h3>
-                <p id="live-value" class="text-4xl font-extrabold text-blue-600 mt-2">--</p>
-            </div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
-                <div>
-                    <h3 class="text-sm font-semibold text-gray-400 uppercase">Historial Clínico</h3>
-                    <p class="text-xs text-gray-500 mt-1">Descarga el registro completo de las lecturas.</p>
+            <div class="lg:col-span-1 space-y-6">
+                
+                <div class="bg-white p-8 rounded-sm shadow-sm border border-gray-100 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-2 bg-blue-50 text-blue-600 text-[10px] font-bold uppercase tracking-tighter">Live Feed</div>
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Señal de Microvoltaje</h3>
+                    <div class="flex items-baseline gap-2">
+                        <p id="live-value" class="text-6xl font-light text-blue-700 tracking-tighter">--</p>
+                        <span class="text-sm font-semibold text-gray-400 uppercase">µV</span>
+                    </div>
                 </div>
-                <a href="/descargar_csv" class="mt-4 inline-block text-center bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-xl transition">
-                    Descargar Datos (.CSV)
-                </a>
+
+                <div class="bg-slate-900 p-8 rounded-sm text-white">
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Reporte de Datos</h3>
+                    <p class="text-sm text-slate-300 mb-6">Generar registro .CSV para análisis clínico detallado.</p>
+                    <a href="/descargar_csv" class="block w-full text-center border border-white/20 hover:bg-white hover:text-slate-900 text-white font-medium py-3 px-4 transition duration-300 uppercase text-xs tracking-widest">
+                        Exportar Historial
+                    </a>
+                </div>
             </div>
+
+            <div class="lg:col-span-2">
+                <div class="bg-white p-8 rounded-sm shadow-sm border border-gray-100 h-full">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest text-slate-700">Comportamiento Muscular (RMS)</h3>
+                        <div class="flex gap-2">
+                            <span class="w-3 h-3 bg-blue-600 rounded-full"></span>
+                            <span class="w-3 h-3 bg-gray-200 rounded-full"></span>
+                        </div>
+                    </div>
+                    <div class="relative w-full h-[350px]">
+                        <canvas id="medicalChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <h3 class="text-lg font-bold text-slate-700 mb-4">Gráfica del Sensor</h3>
-            <div class="relative w-full h-[300px]">
-                <canvas id="medicalChart"></canvas>
-            </div>
-        </div>
+        <footer class="mt-16 pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between gap-4 text-[10px] text-gray-400 uppercase tracking-widest font-bold">
+            <p>© 2026 Tecnológico de Monterrey | IMD</p>
+            <p>Prototipo de Investigación sEMG-v1.0</p>
+        </footer>
     </div>
 
     <script>
         const ctx = document.getElementById('medicalChart').getContext('2d');
         
-        // Inicializamos la gráfica vacía
         const medicalChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: [], // Aquí se irán agregando las marcas de tiempo (ej. 14:32:01)
+                labels: [],
                 datasets: [{
-                    label: 'Lectura del Dispositivo',
-                    data: [], // Aquí se irán agregando los valores numéricos del sensor
+                    label: 'µV (sEMG)',
+                    data: [],
                     borderColor: '#2563eb',
-                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                    borderWidth: 2,
+                    backgroundColor: 'rgba(37, 99, 235, 0.05)',
+                    borderWidth: 1.5,
+                    pointRadius: 0, // Sin puntos para que se vea más profesional (limpio)
                     fill: true,
-                    tension: 0.3
+                    tension: 0.4
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
                 scales: {
-                    x: { grid: { display: false } },
-                    y: { beginAtZero: true }
+                    x: { 
+                        grid: { display: false },
+                        ticks: { font: { size: 10 } }
+                    },
+                    y: { 
+                        beginAtZero: true,
+                        grid: { color: '#F1F5F9' },
+                        ticks: { font: { size: 10 } }
+                    }
                 }
             }
         });
 
-        // Función que actualiza la interfaz visual cada vez que llega un dato
         function actualizarPantalla(valor) {
-            const ahora = new Date().toLocaleTimeString();
+            const ahora = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
             document.getElementById('live-value').innerText = valor;
 
-            // Para que la gráfica no se sature, solo mostramos los últimos 15 datos en pantalla
-            if (medicalChart.data.labels.length > 15) {
+            if (medicalChart.data.labels.length > 20) {
                 medicalChart.data.labels.shift();
                 medicalChart.data.datasets[0].data.shift();
             }
@@ -84,11 +121,11 @@
             medicalChart.update();
         }
 
-        // Simulación temporal: Genera un número aleatorio simulando un sensor cada 2 segundos
+        // Simulación
         setInterval(() => {
-            let valorSimulado = (Math.random() * (80 - 70) + 70).toFixed(1); 
+            let valorSimulado = (Math.random() * (120 - 40) + 40).toFixed(1); 
             actualizarPantalla(valorSimulado);
-        }, 2000);
+        }, 1500);
     </script>
 </body>
 </html>
