@@ -91,7 +91,7 @@
 
                 <div class="space-y-2">
                     <button onclick="descargarCSV()" class="w-full py-4 bg-emerald-500 text-white rounded-2xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-emerald-50">Exportar CSV ⤓</button>
-                    <button onclick="location.reload()" class="w-full py-4 border-2 border-dashed border-slate-200 rounded-2xl text-[9px] font-black text-slate-400 hover:text-blue-500 transition-all uppercase tracking-widest">Reiniciar ↺</button>
+                    <button onclick="requestReset()" class="w-full py-4 border-2 border-dashed border-slate-200 rounded-2xl text-[9px] font-black text-slate-400 hover:text-blue-500 transition-all uppercase tracking-widest">Reiniciar ↺</button>
                 </div>
             </div>
 
@@ -144,7 +144,6 @@
         let allRawValues = []; 
         let canCountRep = true;
 
-        // Configuración de Anotaciones (Línea de Umbral)
         const annotationsConfig = {
             thresholdLine: {
                 type: 'line', yMin: 60, yMax: 60,
@@ -187,7 +186,7 @@
                         backgroundColor: '#ef4444',
                         pointRadius: 6,
                         pointHoverRadius: 8,
-                        showLine: false // Para que sean solo puntos
+                        showLine: false 
                     }
                 ] 
             },
@@ -204,14 +203,12 @@
             const rawVal = Math.random() * 100;
             const time = new Date().toLocaleTimeString('es-MX', { hour12: false });
 
-            // Guardar para el histórico total
             allRawLabels.push(time);
             allRawValues.push(rawVal);
 
-            // Actualizar gráfica en tiempo real (ventana de 50 puntos)
             rawChart.data.labels.push(time);
             rawChart.data.datasets[0].data.push(rawVal);
-            rawChart.data.datasets[1].data.push(null); // Espacio vacío para el marcador si no hay rep
+            rawChart.data.datasets[1].data.push(null); 
 
             if (rawChart.data.labels.length > 50) {
                 rawChart.data.labels.shift();
@@ -219,17 +216,13 @@
                 rawChart.data.datasets[1].data.shift();
             }
 
-            // DETECCIÓN DE REPETICIÓN
             if(rawVal > 60 && canCountRep && count < 10) {
                 count++;
                 canCountRep = false;
                 document.getElementById('main-counter').innerText = count;
                 document.getElementById('global-progress').style.width = (count * 10) + "%";
-
-                // Poner el punto en la gráfica (Marcador rojo)
                 rawChart.data.datasets[1].data[rawChart.data.datasets[1].data.length - 1] = rawVal;
 
-                // Fila en Tabla
                 const tableBody = document.getElementById('table-entries');
                 tableBody.innerHTML = `<tr class="animate-fade-in"><td class="py-2 font-bold text-slate-700">Rep ${count}</td><td class="py-2 text-right font-mono text-blue-600">${time}</td></tr>` + tableBody.innerHTML;
 
@@ -242,34 +235,57 @@
             }
             
             rawChart.update('none');
-        }, 150); // Un poco más rápido para fluidez
+        }, 150);
 
         function finalizarYExpandirGrafica() {
-            // Cambiar estado visual
-            
-            document.getElementById('global-status-bar').classList.replace('bg-slate-100', 'bg-blue-500');
+            document.getElementById('global-status-bar').classList.remove('bg-emerald-500');
+            document.getElementById('global-status-bar').classList.add('bg-blue-500');
             document.getElementById('status-text').innerText = "✓ ANÁLISIS COMPLETADO";
             document.getElementById('chart-title').innerText = "VISTA COMPLETA DE LA SESIÓN (10 REPS)";
             
-            // 1. Cargar TODOS los datos en la gráfica
             rawChart.data.labels = allRawLabels;
             rawChart.data.datasets[0].data = allRawValues;
-            
-            // Re-mapear los puntos rojos (marcadores) en el histórico total
-            // (Para efectos de esta simulación rápida, solo mostramos la línea completa)
             rawChart.data.datasets[1].data = new Array(allRawValues.length).fill(null);
-            
-            // Ajustar escalas para ver todo
-            rawChart.options.scales.x.display = true; // Mostrar eje tiempo al final
+            rawChart.options.scales.x.display = true; 
             rawChart.update();
 
-            // 2. Cálculos matemáticos
             const n = allRawValues.length;
             const rms = Math.sqrt(allRawValues.reduce((sum, v) => sum + v*v, 0) / n);
             const arv = allRawValues.reduce((sum, v) => sum + Math.abs(v), 0) / n;
             
             document.getElementById('value-rms').innerText = rms.toFixed(2);
             document.getElementById('value-arv').innerText = arv.toFixed(2);
+        }
+
+        function requestReset() {
+            if (confirm("¿Estás seguro de que deseas reiniciar la sesión actual? Se borrarán todos los datos registrados.")) {
+                // Reset Variables
+                count = 0;
+                allRawLabels = [];
+                allRawValues = [];
+                isRecording = true;
+                canCountRep = true;
+
+                // UI Reset
+                document.getElementById('main-counter').innerText = "0";
+                document.getElementById('global-progress').style.width = "0%";
+                document.getElementById('table-entries').innerHTML = "";
+                document.getElementById('value-rms').innerText = "--";
+                document.getElementById('value-arv').innerText = "--";
+                document.getElementById('chart-title').innerText = "Señal RAW en Tiempo Real";
+                
+                // Status Bar Reset a "Vivo"
+                document.getElementById('global-status-bar').className = "bg-emerald-500 border-b border-slate-200 py-2 px-8 flex justify-center items-center gap-4 transition-all duration-500";
+                document.getElementById('status-text').innerText = "● REGISTRO EN VIVO";
+                document.getElementById('status-text').className = "text-[9px] font-bold uppercase tracking-widest text-white italic text-center";
+
+                // Chart Reset
+                rawChart.data.labels = [];
+                rawChart.data.datasets[0].data = [];
+                rawChart.data.datasets[1].data = [];
+                rawChart.options.scales.x.display = false;
+                rawChart.update();
+            }
         }
 
         function descargarCSV() {
