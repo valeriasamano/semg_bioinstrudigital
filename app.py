@@ -1,59 +1,75 @@
-from flask import Flask, render_template, request, jsonify, send_file, redirect, url_for, flash
-import csv
-import os
+from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
+from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
+import os
 from datetime import datetime
 
 app = Flask(__name__)
-CSV_FILE = 'datos_pacientes.csv'
+app.config['SECRET_KEY'] = 'biomedica_tec_2026'
+
+# Conexión a la base de datos de Render
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+
+# MODELO DE USUARIO
+class User(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
+
+# CARGAR USUARIO
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+# RUTAS
+@app.route('/')
+@login_required
+def home():
+    return render_template('index.html', name=current_user.username)
 
 @app.route('/prototipo')
 def prototipo():
     return render_template('prototipo.html')
-@app.route('/')
-@login_required  # <-- Esta línea es la que obliga a pedir login
-def home():
-    return render_template('index.html')
 
-# Si el archivo CSV no existe, lo crea con sus columnas correspondientes
-if not os.path.exists(CSV_FILE):
-    with open(CSV_FILE, mode='w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(['Fecha_Hora', 'Dispositivo_ID', 'Valor_Sensor'])
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        user = User.query.filter_by(username=request.form['username']).first()
+        if user and check_password_hash(user.password, request.form['password']):
+            login_user(user)
+            return redirect(url_for('home'))
+        flash('Credenciales incorrectas')
+    return render_template('login.html')
 
-# 1. Esta ruta recibe los datos que el Arduino envía por WiFi
-@app.route('/update_data', methods=['POST'])
-def update_data():
-    try:
-        data = request.get_json()
-        if not data:
-            return jsonify({"status": "error", "message": "No se recibieron datos"}), 400
-            
-        valor = data.get('valor')
-        dispositivo = data.get('dispositivo_id', 'DESCONOCIDO')
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+@app.route('/registro', methods=['GET', 'POST'])
+def registro():
+    if request.method == 'POST':
+        # Verificamos si el usuario ya existe
+        exists = User.query.filter_by(username=request.form['username']).first()
+        if not exists:
+            hashed_pw = generate_password_hash(request.form['password'])
+            new_user = User(username=request.form['username'], password=hashed_pw)
+            db.session.add(new_user)
+            db.session.commit()
+            return redirect(url_for('login'))
+        flash('El usuario ya existe')
+    return render_template('registro.html')
 
-        # Guardar la lectura en el archivo CSV
-        with open(CSV_FILE, mode='a', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow([timestamp, dispositivo, valor])
-        
-        return jsonify({"status": "success", "message": "Datos guardados exitosamente"}), 200
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
 
-# 2. Esta ruta permite al médico descargar el CSV presionando un botón
-@app.route('/descargar_csv')
-def descargar_csv():
-    try:
-        return send_file(CSV_FILE, as_attachment=True)
-    except Exception as e:
-        return "El archivo de datos aún no se ha generado.", 404
-
-# 3. Esta ruta muestra la página web visual (el frontend)
-@app.route('/')
-def index():
-    return render_template('index.html')
+# CREAR TABLAS
+with app.app_context():
+    db.create_all()
 
 if __name__ == '__main__':
     app.run(debug=True)
