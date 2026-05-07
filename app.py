@@ -8,6 +8,9 @@ CSV_FILE = 'datos_pacientes.csv'
 @app.route('/')
 def home():
     return render_template('index.html')
+@app.route('/nosotros')
+def nosotros():
+    return render_template('nosotros.html')
 
 # Si el archivo CSV no existe, lo crea con sus columnas correspondientes
 if not os.path.exists(CSV_FILE):
