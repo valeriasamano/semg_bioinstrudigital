@@ -14,7 +14,7 @@
 <body class="bg-[#F4F7F9] text-slate-900 font-sans overflow-hidden">
 
     <div id="overlay-preparacion" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/80 backdrop-blur-md p-4">
-        <div class="bg-white max-w-4xl w-full rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
+        <div class="bg-white max-w-4xl w-full rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row border border-white/20">
             
             <div class="p-10 md:w-1/2 bg-slate-50 border-r border-gray-100">
                 <div class="mb-8">
@@ -23,29 +23,29 @@
                 </div>
                 
                 <div class="space-y-4 text-sm text-slate-600 leading-relaxed">
-                    <p>Bienvenido. Antes de iniciar la visualización, es imperativo asegurar la calidad de la señal sEMG.</p>
-                    <p>Este sistema registrará <strong>10 repeticiones</strong> de contracción una vez que usted active el modo de registro en el monitor principal.</p>
+                    <p>Bienvenido. Para asegurar la integridad de la señal, confirme los pasos de preparación física del paciente.</p>
+                    <p>Una vez validado, el monitor estará activo para visualización pasiva y registro de datos.</p>
                     <div class="p-4 bg-blue-50 border-l-4 border-blue-400 rounded-r-lg mt-6">
-                        <p class="text-[11px] text-blue-800 font-medium uppercase italic tracking-tighter">Herramienta de acompañamiento médico. No emite diagnósticos.</p>
+                        <p class="text-[11px] text-blue-800 font-medium uppercase italic tracking-tighter tracking-widest">Acompañamiento Técnico Biomédico</p>
                     </div>
                 </div>
             </div>
 
             <div class="p-10 md:w-1/2 flex flex-col justify-center bg-white">
-                <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-8">Validación de Hardware</h3>
+                <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-8 font-bold">Checklist de Hardware</h3>
                 
                 <div class="space-y-6 mb-10">
                     <label class="flex items-center gap-4 group cursor-pointer">
-                        <input type="checkbox" class="check-protocolo w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 transition-all">
-                        <span class="text-xs text-slate-700 group-hover:text-black">Piel limpia y preparada (alcohol)</span>
+                        <input type="checkbox" class="check-protocolo w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        <span class="text-xs text-slate-700 group-hover:text-black transition">Piel limpia y libre de vello/aceites</span>
                     </label>
                     <label class="flex items-center gap-4 group cursor-pointer">
-                        <input type="checkbox" class="check-protocolo w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 transition-all">
-                        <span class="text-xs text-slate-700 group-hover:text-black">Electrodos en el vientre del músculo</span>
+                        <input type="checkbox" class="check-protocolo w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        <span class="text-xs text-slate-700 group-hover:text-black transition">Electrodos en el vientre del músculo</span>
                     </label>
                     <label class="flex items-center gap-4 group cursor-pointer">
-                        <input type="checkbox" class="check-protocolo w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 transition-all">
-                        <span class="text-xs text-slate-700 group-hover:text-black">Electrodo de referencia (tierra) en hueso</span>
+                        <input type="checkbox" class="check-protocolo w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        <span class="text-xs text-slate-700 group-hover:text-black transition">Electrodo de referencia (tierra) en hueso</span>
                     </label>
                 </div>
 
@@ -61,12 +61,6 @@
         <nav class="bg-white border-b border-gray-200 py-4 px-8 flex justify-between items-center shadow-sm">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold shadow-lg shadow-blue-100">sEMG</div>
-                <h1 class="text-xl font-bold tracking-tighter text-slate-800 uppercase italic">Monitor Clínico</h1>
+                <h1 class="text-xl font-bold tracking-tighter text-slate-800 uppercase italic">Sistema de Monitoreo</h1>
             </div>
-            <div class="space-x-8 text-[10px] font-black uppercase tracking-widest flex items-center">
-                <a href="/" class="text-blue-600 border-b-2 border-blue-600 pb-1">Monitor</a>
-                <a href="{{ url_for('logout') }}" class="text-red-400 hover:text-red-600 transition-all">Cerrar Sesión</a>
-            </div>
-        </nav>
-
-        <main class="max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 overflow-y-auto w
+            <div class="space-x-8 text-[10px] font-black uppercase tracking-widest flex items-
