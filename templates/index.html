@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>sEMG Clinical Monitor</title>
+    <title>sEMG</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
@@ -13,9 +13,9 @@
     <nav class="bg-white border-b border-gray-200 py-4 px-8 flex justify-between items-center shadow-sm">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">sEMG</div>
-            <h1 class="text-xl font-bold tracking-tighter text-slate-800 uppercase">Monitor de Atrofia UCI</h1>
+            <h1 class="text-xl font-bold tracking-tighter text-slate-800 uppercase">Sistema de Monitoreo: sEMG</h1>
         </div>
-        <div class="space-x-8 text-xs font-bold uppercase tracking-widest text-gray-500">
+        <div class="space-x-8 text-xs font-bold uppercase tracking-widest text-pink-500">
             <a href="/" class="text-blue-600 border-b-2 border-blue-600 pb-1">Monitor</a>
             <a href="/prototipo" class="hover:text-blue-600 transition">Prototipo</a>
         </div>
@@ -26,7 +26,7 @@
         <div class="lg:col-span-3 space-y-6">
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                 <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Contador de Contracciones</h3>
-                <p id="cont-contracciones" class="text-6xl font-light text-blue-600">0</p>
+                <p id="cont-contracciones" class="text-6xl font-light text-blue-700">0</p>
                 <p class="text-[10px] text-gray-400 mt-2 italic">* Superando umbral del 60%</p>
             </div>
 
@@ -63,11 +63,11 @@
 
     <div id="infoModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white max-w-md w-full rounded-2xl p-8 shadow-2xl">
-            <h2 class="text-2xl font-bold text-slate-900 mb-4">Glosario Clínico</h2>
+            <h2 class="text-2xl font-bold text-slate-900 mb-4">Glosario Clínico para sEMG</h2>
             <div class="space-y-4 text-sm text-slate-600 leading-relaxed">
-                <p><strong>RMS (Root Mean Square):</strong> Mide la potencia de la señal eléctrica. Es el parámetro más confiable para evaluar cuánta fuerza está haciendo el músculo.</p>
+                <p><strong>RMS (Root Mean Square):</strong> Mide la potencia de la señal eléctrica, unidades en mV.</p>
                 <hr>
-                <p><strong>ARS (Average Rectified Value):</strong> Es el promedio del área de la señal. Ayuda a detectar cambios en la conducción nerviosa y fatiga.</p>
+                <p><strong>ARS (Average Rectified Value):</strong> Es el promedio del área de la señal, unidades en mV.</p>
             </div>
             <button onclick="closeModal()" class="mt-8 w-full bg-blue-600 text-white font-bold py-3 rounded-xl uppercase text-xs tracking-widest hover:bg-blue-700 transition">Cerrar</button>
         </div>
@@ -89,9 +89,9 @@
         const rmsCtx = document.getElementById('rmsChart').getContext('2d');
         const arsCtx = document.getElementById('arsChart').getContext('2d');
 
-        const rawChart = new Chart(rawCtx, chartConfig('#3b82f6', 'Señal Raw'));
-        const rmsChart = new Chart(rmsCtx, chartConfig('#10b981', 'RMS'));
-        const arsChart = new Chart(arsCtx, chartConfig('#f59e0b', 'ARS'));
+        const rawChart = new Chart(rawCtx, chartConfig('#8a2527', 'Señal Raw'));
+        const rmsChart = new Chart(rmsCtx, chartConfig('#d25cd6', 'RMS'));
+        const arsChart = new Chart(arsCtx, chartConfig('#408cc7', 'ARS'));
 
         // Añadir línea de umbral a la gráfica RAW
         rawChart.options.plugins = {
