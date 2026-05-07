@@ -34,7 +34,7 @@
         <div id="vista-info" class="py-12 space-y-12 animate-fade-in">
             <div class="max-w-3xl">
                 <h2 class="text-5xl font-light text-slate-800 leading-tight mb-6 italic">Medición fisiológica <br><strong> de sEMG </strong></h2>
-                <p class="text-slate-500 text-lg leading-relaxed">Monitoreo avanzado para la prevención de atrofia muscular y análisis de señales mioeléctricas.</p>
+                <p class="text-slate-500 text-lg leading-relaxed">Análisis de señales mioeléctricas para la prevención de atrofia muscular con procesamiento matemático integrado.</p>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -44,18 +44,18 @@
                 </div>
                 <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
                     <p class="text-[10px] font-black text-purple-600 uppercase mb-2 tracking-widest">Métrica RMS</p>
-                    <p class="text-[11px] text-slate-500 italic">Root Mean Square: Medida de potencia eléctrica de la contracción muscular.</p>
+                    <p class="text-[11px] text-slate-500 italic">Root Mean Square: Potencia de contracción.</p>
                 </div>
                 <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
                     <p class="text-[10px] font-black text-cyan-600 uppercase mb-2 tracking-widest">Métrica ARV</p>
-                    <p class="text-[11px] text-slate-500 italic">Average Rectified Value: Promedio de la señal rectificada (reclutamiento motor).</p>
+                    <p class="text-[11px] text-slate-500 italic">Average Rectified Value: Reclutamiento motor.</p>
                 </div>
             </div>
 
             <button onclick="openControlPopup()" class="w-full bg-blue-600 p-8 rounded-[32px] text-white shadow-2xl flex justify-between items-center hover:scale-[1.01] transition-transform">
                 <div class="text-left">
                     <h3 class="text-xl font-bold italic uppercase tracking-tighter">Nueva Sesión de Lectura</h3>
-                    <p class="text-sm opacity-80 font-medium">Inicia el monitoreo y visualización en tiempo real.</p>
+                    <p class="text-sm opacity-80 font-medium">Inicia el monitoreo con umbral de detección del 60%.</p>
                 </div>
                 <span class="bg-white text-blue-600 px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest">Comenzar</span>
             </button>
@@ -69,6 +69,7 @@
                     <div class="w-full bg-slate-100 h-2 rounded-full mt-4 overflow-hidden">
                         <div id="global-progress" class="bg-blue-600 h-full w-0 transition-all duration-700"></div>
                     </div>
+                    <p class="text-[8px] font-bold text-slate-300 mt-2 uppercase">Umbral Activo: >60 uV</p>
                 </div>
 
                 <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 space-y-3">
@@ -142,6 +143,7 @@
         let isRecording = false;
         let count = 0;
         let allRawData = []; 
+        let canCountRep = true; // Para evitar que una misma contracción cuente varias veces
 
         function openControlPopup() { document.getElementById('controlPopup').classList.remove('hidden'); }
         function closeControlPopup() { document.getElementById('controlPopup').classList.add('hidden'); }
@@ -160,7 +162,6 @@
             if(confirm("¿Seguro que deseas finalizar esta sesión?")) { location.reload(); }
         }
 
-        // LÓGICA DE EXPORTACIÓN CSV (Ahora flexible)
         function descargarCSV() {
             const paciente = document.getElementById('paciente-id').value || "No_Identificado";
             const doctor = document.getElementById('doctor-id').value || "No_Especificado";
@@ -183,7 +184,6 @@
             link.click();
         }
 
-        // Validación Checklist
         const checks = document.querySelectorAll('.step-check');
         const startBtn = document.getElementById('btn-start-global');
         checks.forEach(c => c.addEventListener('change', () => {
@@ -192,7 +192,6 @@
             startBtn.className = allChecked ? "flex-[2] bg-blue-600 text-white py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg" : "flex-[2] bg-slate-200 text-slate-400 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest";
         }));
 
-        // Gráficas
         const chartConfig = (color) => ({
             type: 'line',
             data: { labels: [], datasets: [{ data: [], borderColor: color, borderWidth: 2, pointRadius: 0, fill: false, tension: 0.4 }] },
@@ -206,6 +205,7 @@
         setInterval(() => {
             if (!isRecording) return;
             
+            // Simulación: Valor aleatorio entre 0 y 100uV
             const rawVal = Math.random() * 100;
             const time = new Date().toLocaleTimeString();
             allRawData.push({ t: time, v: rawVal.toFixed(2) });
@@ -221,14 +221,23 @@
                 chart.update('none');
             });
 
-            if(rawVal > 90 && count < 10) {
-                count++;
-                document.getElementById('main-counter').innerText = count;
-                document.getElementById('global-progress').style.width = (count * 10) + "%";
-                if(count === 10) { 
-                    isRecording = false; 
-                    finalizarProtocoloMatematico(); 
+            // LÓGICA DE UMBRAL (60%)
+            // Si el valor supera 60uV, es una contracción
+            if(rawVal > 60) {
+                if(canCountRep && count < 10) {
+                    count++;
+                    document.getElementById('main-counter').innerText = count;
+                    document.getElementById('global-progress').style.width = (count * 10) + "%";
+                    canCountRep = false; // Bloqueamos hasta que baje la señal
+                    
+                    if(count === 10) { 
+                        isRecording = false; 
+                        finalizarProtocoloMatematico(); 
+                    }
                 }
+            } else if (rawVal < 20) {
+                // Si la señal baja de 20uV, permitimos contar la siguiente repetición (relajación)
+                canCountRep = true;
             }
         }, 800);
 
