@@ -17,9 +17,8 @@
         <div class="space-x-8 text-[10px] font-black uppercase tracking-widest flex items-center">
             <a href="/" class="text-blue-600 border-b-2 border-blue-600 pb-1">Monitor</a>
             <a href="/prototipo" class="text-slate-400 hover:text-blue-600 transition">Prototipo</a>
-            <button onclick="salirDeLectura()" class="text-red-400 hover:text-red-600 transition">Salir de Lectura</button>
-            <button onclick="LogOut()" class="text-red-400 hover:text-red-600 transition">LogOut</button>
-
+            <button onclick="salirDeLectura()" class="text-slate-400 hover:text-red-500 transition">Salir de Lectura</button>
+            <a href="{{ url_for('logout') }}" onclick="localStorage.removeItem('seguridadValidada')" class="bg-red-50 text-red-500 px-4 py-2 rounded-full hover:bg-red-500 hover:text-white transition-all font-black">LogOut</a>
         </div>
     </nav>
 
@@ -29,7 +28,7 @@
 
     <main class="max-w-7xl mx-auto p-6">
         
-        <div id="vista-info" class="py-12 space-y-8">
+        <div id="vista-info" class="py-12 space-y-12 animate-fade-in">
             <div class="max-w-3xl">
                 <h2 class="text-5xl font-light text-slate-800 leading-tight mb-6">Medición fisiológica <br><strong> de sEMG </strong></h2>
                 <p class="text-slate-500 text-lg leading-relaxed">
@@ -38,51 +37,64 @@
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                    <p class="text-[10px] font-black text-blue-600 uppercase mb-2">Hardware</p>
-                    <p class="text-sm font-bold text-slate-700">MyoWare 2.0 + Arduino Uno R4</p>
+                <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-center">
+                    <p class="text-[10px] font-black text-blue-600 uppercase mb-2">Hardware Central</p>
+                    <p class="text-sm font-bold text-slate-700 leading-tight">MyoWare 2.0 <br> Arduino Uno R4</p>
                 </div>
-                <div class="bg-blue-600 p-6 rounded-2xl text-white shadow-xl shadow-blue-100 md:col-span-2 flex justify-between items-center">
-                    <div>
-                        <p class="text-xs font-bold uppercase opacity-80 mb-1">¿Listo para comenzar?</p>
-                        <p class="text-sm">Inicia una nueva sesión de registro para todos los usuarios.</p>
-                    </div>
-                    <button onclick="openControlPopup()" class="bg-white text-blue-600 px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-50 transition-all">
-                        Nueva Sesión
-                    </button>
+
+                <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+                    <p class="text-[10px] font-black text-purple-600 uppercase mb-2">Métrica RMS</p>
+                    <p class="text-[11px] text-slate-500 italic leading-snug">
+                        <strong>Root Mean Square:</strong> Representa la potencia media de la señal eléctrica, ideal para observar el nivel de esfuerzo muscular sostenido.
+                    </p>
                 </div>
+                <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+                    <p class="text-[10px] font-black text-cyan-600 uppercase mb-2">Métrica ARV</p>
+                    <p class="text-[11px] text-slate-500 italic leading-snug">
+                        <strong>Average Rectified Value:</strong> Mide el área bajo la curva rectificada, útil para detectar el volumen de activación de las unidades motoras.
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-blue-600 p-8 rounded-3xl text-white shadow-xl shadow-blue-100 flex justify-between items-center">
+                <div>
+                    <h3 class="text-xl font-bold italic mb-1 uppercase tracking-tighter">¿Listo para comenzar el protocolo?</h3>
+                    <p class="text-sm opacity-80 font-medium tracking-tight italic">Asegúrate de que los electrodos estén colocados en el vientre del músculo.</p>
+                </div>
+                <button onclick="openControlPopup()" class="bg-white text-blue-600 px-8 py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest hover:scale-105 transition-all shadow-lg">
+                    Nueva Sesión
+                </button>
             </div>
         </div>
 
-        <div id="vista-monitor" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6 animate-fade-in">
-            
+        <div id="vista-monitor" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div class="lg:col-span-3 space-y-6">
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 text-center">
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 text-center">
                     <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Repeticiones Logradas</h3>
-                    <p id="main-counter" class="text-7xl font-light text-blue-600">0</p>
-                    <div class="w-full bg-slate-50 h-2 rounded-full mt-4 overflow-hidden">
-                        <div id="global-progress" class="bg-blue-600 h-full w-0 transition-all duration-500"></div>
+                    <p id="main-counter" class="text-7xl font-light text-blue-600 transition-all">0</p>
+                    <div class="w-full bg-slate-50 h-3 rounded-full mt-6 overflow-hidden border border-slate-100">
+                        <div id="global-progress" class="bg-blue-600 h-full w-0 transition-all duration-700 ease-out"></div>
                     </div>
-                    <p class="text-[9px] text-slate-400 mt-4 font-bold uppercase italic">Meta del Protocolo: 10</p>
+                    <p id="meta-text" class="text-[9px] text-slate-400 mt-4 font-bold uppercase italic tracking-widest">Meta del Protocolo: 10</p>
                 </div>
-                <button onclick="requestReset()" class="w-full py-3 text-[9px] font-black text-slate-300 hover:text-red-400 uppercase tracking-widest transition">
+                <button onclick="requestReset()" class="w-full py-4 border-2 border-dashed border-slate-200 rounded-2xl text-[9px] font-black text-slate-400 hover:text-red-500 hover:border-red-200 uppercase tracking-widest transition-all">
                     Reiniciar Lectura Global ↺
                 </button>
             </div>
 
             <div class="lg:col-span-9 space-y-6">
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
                     <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Señal RAW + Umbral de Detección</h3>
                     <div class="h-64"><canvas id="rawChart"></canvas></div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 h-64">
-                        <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Métrica RMS</h3>
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 h-64">
+                        <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 italic text-purple-600 tracking-tighter">Potencia RMS</h3>
                         <canvas id="rmsChart"></canvas>
                     </div>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 h-64">
-                        <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Métrica ARS</h3>
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 h-64">
+                        <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 italic text-cyan-600 tracking-tighter">Área ARV</h3>
                         <canvas id="arsChart"></canvas>
                     </div>
                 </div>
@@ -91,21 +103,21 @@
     </main>
 
     <div id="controlPopup" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-        <div class="bg-white max-w-lg w-full rounded-3xl shadow-2xl p-10">
-            <h2 class="text-2xl font-light text-slate-800 mb-6 italic">Iniciar <strong>Captura de Datos</strong></h2>
+        <div class="bg-white max-w-lg w-full rounded-[40px] shadow-2xl p-12">
+            <h2 class="text-3xl font-light text-slate-800 mb-8 italic">Iniciar <strong>Registro</strong></h2>
             <div class="space-y-4 mb-10">
-                <label class="flex items-center gap-4 p-4 border border-slate-100 rounded-2xl cursor-pointer">
+                <label class="flex items-center gap-4 p-5 border border-slate-100 rounded-2xl cursor-pointer hover:bg-slate-50 transition">
                     <input type="checkbox" class="step-check w-5 h-5 accent-blue-600">
                     <span class="text-sm text-slate-600 italic font-medium tracking-tight">Electrodos colocados correctamente</span>
                 </label>
-                <label class="flex items-center gap-4 p-4 border border-slate-100 rounded-2xl cursor-pointer">
+                <label class="flex items-center gap-4 p-5 border border-slate-100 rounded-2xl cursor-pointer hover:bg-slate-50 transition">
                     <input type="checkbox" class="step-check w-5 h-5 accent-blue-600">
-                    <span class="text-sm text-slate-600 italic font-medium tracking-tight">Referencia conectada a tierra</span>
+                    <span class="text-sm text-slate-600 italic font-medium tracking-tight">Referencia conectada a tierra ósea</span>
                 </label>
             </div>
-            <div class="flex gap-3">
+            <div class="flex gap-4">
                 <button onclick="closeControlPopup()" class="flex-1 py-4 text-[10px] font-black uppercase text-slate-400">Cancelar</button>
-                <button id="btn-start-global" disabled onclick="startGlobalSession()" class="flex-[2] bg-slate-200 text-slate-400 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all">Comenzar Registro</button>
+                <button id="btn-start-global" disabled onclick="startGlobalSession()" class="flex-[2] bg-slate-200 text-slate-400 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all">Comenzar</button>
             </div>
         </div>
     </div>
@@ -114,81 +126,80 @@
         let isRecording = false;
         let count = 0;
 
-        // --- NAVEGACIÓN ---
         function startGlobalSession() {
             closeControlPopup();
             document.getElementById('vista-info').classList.add('hidden');
             document.getElementById('vista-monitor').classList.remove('hidden');
-            
             const banner = document.getElementById('global-status-bar');
             banner.classList.replace('bg-slate-100', 'bg-emerald-500');
-            document.getElementById('status-text').innerText = "● REGISTRO EN VIVO PARA TODOS LOS USUARIOS";
+            document.getElementById('status-text').innerText = "● REGISTRO EN VIVO ACTIVADO";
             document.getElementById('status-text').classList.replace('text-slate-500', 'text-white');
-            
             isRecording = true;
         }
 
         function salirDeLectura() {
-            if(confirm("¿Deseas salir del monitor? Esto no detendrá el registro para otros usuarios.")) {
+            if(confirm("¿Regresar a la página principal?")) {
                 document.getElementById('vista-monitor').classList.add('hidden');
                 document.getElementById('vista-info').classList.remove('hidden');
-                
                 const banner = document.getElementById('global-status-bar');
                 banner.classList.replace('bg-emerald-500', 'bg-slate-100');
                 document.getElementById('status-text').innerText = "Sistema en Espera - No se están registrando datos";
                 document.getElementById('status-text').classList.replace('text-white', 'text-slate-500');
-                
                 isRecording = false;
-                count = 0; // Reset local
-                document.getElementById('main-counter').innerText = "0";
-                document.getElementById('global-progress').style.width = "0%";
             }
         }
 
-        // --- POPUP ---
         function openControlPopup() { document.getElementById('controlPopup').classList.remove('hidden'); }
         function closeControlPopup() { document.getElementById('controlPopup').classList.add('hidden'); }
 
         const checks = document.querySelectorAll('.step-check');
         const startBtn = document.getElementById('btn-start-global');
-
         checks.forEach(c => c.addEventListener('change', () => {
             const allChecked = Array.from(checks).every(i => i.checked);
             startBtn.disabled = !allChecked;
-            startBtn.className = allChecked ? 
-                "flex-[2] bg-blue-600 text-white py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-200" :
-                "flex-[2] bg-slate-200 text-slate-400 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest";
+            startBtn.className = allChecked ? "flex-[2] bg-blue-600 text-white py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg" : "flex-[2] bg-slate-200 text-slate-400 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest";
         }));
 
-        // --- GRÁFICAS ORIGINALES REESTABLECIDAS ---
         const chartConfig = (color, label) => ({
             type: 'line',
             data: { labels: [], datasets: [{ label, data: [], borderColor: color, borderWidth: 2, pointRadius: 0, fill: false, tension: 0.4 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { beginAtZero: true } } }
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { beginAtZero: true, grid: { color: '#f1f5f9' } } } }
         });
 
         const rawChart = new Chart(document.getElementById('rawChart').getContext('2d'), chartConfig('#2563eb', 'Raw'));
-        const rmsChart = new Chart(document.getElementById('rmsChart').getContext('2d'), chartConfig('#d25cd6', 'RMS'));
-        const arsChart = new Chart(document.getElementById('arsChart').getContext('2d'), chartConfig('#408cc7', 'ARS'));
+        const rmsChart = new Chart(document.getElementById('rmsChart').getContext('2d'), chartConfig('#9333ea', 'RMS'));
+        const arsChart = new Chart(document.getElementById('arsChart').getContext('2d'), chartConfig('#0891b2', 'ARS'));
 
-        // Simulación
+        // Simulación con detención automática
         setInterval(() => {
             if (!isRecording) return;
+            
             const rawVal = Math.random() * 100;
             const time = new Date().toLocaleTimeString();
 
             [rawChart, rmsChart, arsChart].forEach((chart, i) => {
-                const val = [rawVal, rawVal*0.7, rawVal*0.5][i];
-                if (chart.data.labels.length > 25) { chart.data.labels.shift(); chart.data.datasets[0].data.shift(); }
+                const val = [rawVal, rawVal*0.75, rawVal*0.4][i];
+                // Solo desplazamos si no hemos terminado el protocolo
+                if (chart.data.labels.length > 30 && count < 10) { 
+                    chart.data.labels.shift(); 
+                    chart.data.datasets[0].data.shift(); 
+                }
                 chart.data.labels.push(time);
                 chart.data.datasets[0].data.push(val);
                 chart.update('none');
             });
 
-            if(rawVal > 80) {
+            if(rawVal > 85 && count < 10) {
                 count++;
                 document.getElementById('main-counter').innerText = count;
                 document.getElementById('global-progress').style.width = (count * 10) + "%";
+                
+                if(count === 10) {
+                    isRecording = false; // Detiene la simulación
+                    document.getElementById('meta-text').innerText = "¡PROTOCOLO COMPLETADO!";
+                    document.getElementById('meta-text').classList.replace('text-slate-400', 'text-emerald-500');
+                    alert("Se han alcanzado las 10 repeticiones. Registro finalizado.");
+                }
             }
         }, 800);
 
