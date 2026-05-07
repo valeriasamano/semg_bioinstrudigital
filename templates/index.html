@@ -3,129 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>sEMG Monitor - Clinical Interface</title>
+    <title>sEMG Clinical Monitor</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
 </head>
-<body class="bg-[#F8F9FA] font-sans text-slate-800">
+<body class="bg-[#F4F7F9] text-slate-900 font-sans">
 
-    <div class="bg-white border-b border-gray-200 py-4 px-6 mb-6">
-        <div class="max-w-5xl mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xs">sEMG</div>
-                <span class="font-bold tracking-tight text-lg uppercase text-slate-900">BioInstrumentation Lab</span>
-            </div>
-            <span class="text-xs font-medium text-gray-400 uppercase tracking-widest">Atrofia Muscular / UCI</span>
+    <nav class="bg-white border-b border-gray-200 py-4 px-8 flex justify-between items-center shadow-sm">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">sEMG</div>
+            <h1 class="text-xl font-bold tracking-tighter text-slate-800 uppercase">Monitor de Atrofia UCI</h1>
         </div>
-    </div>
+        <div class="space-x-8 text-xs font-bold uppercase tracking-widest text-gray-500">
+            <a href="/" class="text-blue-600 border-b-2 border-blue-600 pb-1">Monitor</a>
+            <a href="/prototipo" class="hover:text-blue-600 transition">Prototipo</a>
+        </div>
+    </nav>
 
-    <div class="max-w-5xl mx-auto p-4 md:p-8">
+    <main class="max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        <header class="mb-12 border-l-4 border-blue-600 pl-6">
-            <h1 class="text-5xl font-light text-slate-900 tracking-tight mb-2">Monitor Clínico de Superficie</h1>
-            <p class="text-lg text-slate-500 font-normal">Prevención de atrofia muscular en pacientes críticos intubados.</p>
-        </header>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
-            <div class="lg:col-span-1 space-y-6">
-                
-                <div class="bg-white p-8 rounded-sm shadow-sm border border-gray-100 relative overflow-hidden">
-                    <div class="absolute top-0 right-0 p-2 bg-blue-50 text-blue-600 text-[10px] font-bold uppercase tracking-tighter">Live Feed</div>
-                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Señal de Microvoltaje</h3>
-                    <div class="flex items-baseline gap-2">
-                        <p id="live-value" class="text-6xl font-light text-blue-700 tracking-tighter">--</p>
-                        <span class="text-sm font-semibold text-gray-400 uppercase">µV</span>
-                    </div>
-                </div>
-
-                <div class="bg-slate-900 p-8 rounded-sm text-white">
-                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Reporte de Datos</h3>
-                    <p class="text-sm text-slate-300 mb-6">Generar registro .CSV para análisis clínico detallado.</p>
-                    <a href="/descargar_csv" class="block w-full text-center border border-white/20 hover:bg-white hover:text-slate-900 text-white font-medium py-3 px-4 transition duration-300 uppercase text-xs tracking-widest">
-                        Exportar Historial
-                    </a>
-                </div>
+        <div class="lg:col-span-3 space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Contador de Contracciones</h3>
+                <p id="cont-contracciones" class="text-6xl font-light text-blue-600">0</p>
+                <p class="text-[10px] text-gray-400 mt-2 italic">* Superando umbral del 60%</p>
             </div>
 
-            <div class="lg:col-span-2">
-                <div class="bg-white p-8 rounded-sm shadow-sm border border-gray-100 h-full">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest text-slate-700">Comportamiento Muscular (RMS)</h3>
-                        <div class="flex gap-2">
-                            <span class="w-3 h-3 bg-blue-600 rounded-full"></span>
-                            <span class="w-3 h-3 bg-gray-200 rounded-full"></span>
-                        </div>
-                    </div>
-                    <div class="relative w-full h-[350px]">
-                        <canvas id="medicalChart"></canvas>
-                    </div>
-                </div>
+            <div class="bg-slate-900 p-6 rounded-xl text-white shadow-xl">
+                <h3 class="text-[10px] font-bold text-blue-400 uppercase mb-4">Información de Sesión</h3>
+                <button onclick="openModal()" class="w-full py-3 border border-white/20 text-[10px] font-bold uppercase tracking-widest hover:bg-white hover:text-slate-900 transition mb-3">
+                    ¿Qué es RMS y ARS?
+                </button>
+                <a href="/descargar_csv" class="block w-full text-center bg-blue-600 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-blue-700 transition">
+                    Exportar Reporte
+                </a>
             </div>
-
         </div>
 
-        <footer class="mt-16 pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between gap-4 text-[10px] text-gray-400 uppercase tracking-widest font-bold">
-            <p>© 2026 Tecnológico de Monterrey | IMD</p>
-            <p>Prototipo de Investigación sEMG-v1.0</p>
-        </footer>
+        <div class="lg:col-span-9 space-y-6">
+            
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h3 class="text-xs font-bold text-slate-400 uppercase mb-4">Señal RAW (Microvoltaje) + Umbral 60%</h3>
+                <div class="h-64"><canvas id="rawChart"></canvas></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase mb-4">Procesamiento RMS</h3>
+                    <div class="h-48"><canvas id="rmsChart"></canvas></div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase mb-4">Procesamiento ARS</h3>
+                    <div class="h-48"><canvas id="arsChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="infoModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white max-w-md w-full rounded-2xl p-8 shadow-2xl">
+            <h2 class="text-2xl font-bold text-slate-900 mb-4">Glosario Clínico</h2>
+            <div class="space-y-4 text-sm text-slate-600 leading-relaxed">
+                <p><strong>RMS (Root Mean Square):</strong> Mide la potencia de la señal eléctrica. Es el parámetro más confiable para evaluar cuánta fuerza está haciendo el músculo.</p>
+                <hr>
+                <p><strong>ARS (Average Rectified Value):</strong> Es el promedio del área de la señal. Ayuda a detectar cambios en la conducción nerviosa y fatiga.</p>
+            </div>
+            <button onclick="closeModal()" class="mt-8 w-full bg-blue-600 text-white font-bold py-3 rounded-xl uppercase text-xs tracking-widest hover:bg-blue-700 transition">Cerrar</button>
+        </div>
     </div>
 
     <script>
-        const ctx = document.getElementById('medicalChart').getContext('2d');
-        
-        const medicalChart = new Chart(ctx, {
+        let cont = 0;
+        let sobreUmbral = false;
+        const UMBRAL = 60; // 60% del valor máximo esperado (puedes ajustarlo)
+
+        // Configuración común para las gráficas
+        const chartConfig = (color, label) => ({
             type: 'line',
-            data: {
-                labels: [],
-                datasets: [{
-                    label: 'µV (sEMG)',
-                    data: [],
-                    borderColor: '#2563eb',
-                    backgroundColor: 'rgba(37, 99, 235, 0.05)',
-                    borderWidth: 1.5,
-                    pointRadius: 0, // Sin puntos para que se vea más profesional (limpio)
-                    fill: true,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    x: { 
-                        grid: { display: false },
-                        ticks: { font: { size: 10 } }
-                    },
-                    y: { 
-                        beginAtZero: true,
-                        grid: { color: '#F1F5F9' },
-                        ticks: { font: { size: 10 } }
-                    }
-                }
-            }
+            data: { labels: [], datasets: [{ label, data: [], borderColor: color, borderWidth: 1.5, pointRadius: 0, fill: false, tension: 0.4 }] },
+            options: { responsive: true, maintainAspectRatio: false, scales: { x: { display: false }, y: { beginAtZero: true } } }
         });
 
-        function actualizarPantalla(valor) {
-            const ahora = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            document.getElementById('live-value').innerText = valor;
+        const rawCtx = document.getElementById('rawChart').getContext('2d');
+        const rmsCtx = document.getElementById('rmsChart').getContext('2d');
+        const arsCtx = document.getElementById('arsChart').getContext('2d');
 
-            if (medicalChart.data.labels.length > 20) {
-                medicalChart.data.labels.shift();
-                medicalChart.data.datasets[0].data.shift();
+        const rawChart = new Chart(rawCtx, chartConfig('#3b82f6', 'Señal Raw'));
+        const rmsChart = new Chart(rmsCtx, chartConfig('#10b981', 'RMS'));
+        const arsChart = new Chart(arsCtx, chartConfig('#f59e0b', 'ARS'));
+
+        // Añadir línea de umbral a la gráfica RAW
+        rawChart.options.plugins = {
+            annotation: {
+                annotations: {
+                    line1: { type: 'line', yMin: UMBRAL, yMax: UMBRAL, borderColor: 'rgba(239, 68, 68, 0.5)', borderWidth: 2, borderDash: [5, 5], label: { content: 'Umbral 60%', display: true } }
+                }
+            }
+        };
+
+        function updateUI(raw, rms, ars) {
+            const time = new Date().toLocaleTimeString();
+
+            // Lógica del contador de contracciones
+            if (raw > UMBRAL && !sobreUmbral) {
+                cont++;
+                sobreUmbral = true;
+                document.getElementById('cont-contracciones').innerText = cont;
+            } else if (raw < UMBRAL) {
+                sobreUmbral = false;
             }
 
-            medicalChart.data.labels.push(ahora);
-            medicalChart.data.datasets[0].data.push(valor);
-            medicalChart.update();
+            // Actualizar gráficas (mantener últimos 20 datos)
+            [rawChart, rmsChart, arsChart].forEach((chart, i) => {
+                const val = [raw, rms, ars][i];
+                if (chart.data.labels.length > 20) { chart.data.labels.shift(); chart.data.datasets[0].data.shift(); }
+                chart.data.labels.push(time);
+                chart.data.datasets[0].data.push(val);
+                chart.update('none');
+            });
         }
 
-        // Simulación
+        // Simulación (El Arduino reemplazará esto)
         setInterval(() => {
-            let valorSimulado = (Math.random() * (120 - 40) + 40).toFixed(1); 
-            actualizarPantalla(valorSimulado);
-        }, 1500);
+            const r = Math.random() * 100;
+            updateUI(r.toFixed(1), (r*0.7).toFixed(1), (r*0.5).toFixed(1));
+        }, 1000);
+
+        function openModal() { document.getElementById('infoModal').classList.remove('hidden'); }
+        function closeModal() { document.getElementById('infoModal').classList.add('hidden'); }
     </script>
 </body>
 </html>
