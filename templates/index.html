@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoreo Médico en Tiempo Real</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-50 font-sans">
+
+    <div class="max-w-4xl mx-auto p-4 md:p-8">
+        <header class="mb-8 text-center md:text-left">
+            <h1 class="text-3xl font-bold text-slate-800">Panel de Monitoreo Clínico</h1>
+            <p class="text-slate-500">Visualización de constantes fisiológicas en tiempo real</p>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 class="text-sm font-semibold text-gray-400 uppercase">Último Valor Recibido</h3>
+                <p id="live-value" class="text-4xl font-extrabold text-blue-600 mt-2">--</p>
+            </div>
+            
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-400 uppercase">Historial Clínico</h3>
+                    <p class="text-xs text-gray-500 mt-1">Descarga el registro completo de las lecturas.</p>
+                </div>
+                <a href="/descargar_csv" class="mt-4 inline-block text-center bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-xl transition">
+                    Descargar Datos (.CSV)
+                </a>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <h3 class="text-lg font-bold text-slate-700 mb-4">Gráfica del Sensor</h3>
+            <div class="relative w-full h-[300px]">
+                <canvas id="medicalChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('medicalChart').getContext('2d');
+        
+        // Inicializamos la gráfica vacía
+        const medicalChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [], // Aquí se irán agregando las marcas de tiempo (ej. 14:32:01)
+                datasets: [{
+                    label: 'Lectura del Dispositivo',
+                    data: [], // Aquí se irán agregando los valores numéricos del sensor
+                    borderColor: '#2563eb',
+                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { grid: { display: false } },
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
+        // Función que actualiza la interfaz visual cada vez que llega un dato
+        function actualizarPantalla(valor) {
+            const ahora = new Date().toLocaleTimeString();
+            document.getElementById('live-value').innerText = valor;
+
+            // Para que la gráfica no se sature, solo mostramos los últimos 15 datos en pantalla
+            if (medicalChart.data.labels.length > 15) {
+                medicalChart.data.labels.shift();
+                medicalChart.data.datasets[0].data.shift();
+            }
+
+            medicalChart.data.labels.push(ahora);
+            medicalChart.data.datasets[0].data.push(valor);
+            medicalChart.update();
+        }
+
+        // Simulación temporal: Genera un número aleatorio simulando un sensor cada 2 segundos
+        setInterval(() => {
+            let valorSimulado = (Math.random() * (80 - 70) + 70).toFixed(1); 
+            actualizarPantalla(valorSimulado);
+        }, 2000);
+    </script>
+</body>
+</html>
