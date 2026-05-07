@@ -24,7 +24,7 @@
         <div class="space-x-8 text-[10px] font-black uppercase tracking-widest flex items-center">
             <a href="/" class="text-blue-600 border-b-2 border-blue-600 pb-1">Monitor</a>
             <a href="/prototipo" class="text-slate-400 hover:text-blue-600 transition">Prototipo</a>
-            <a href="{{ url_for('logout') }}" onclick="localStorage.removeItem('seguridadValidada')" class="bg-red-50 text-red-500 px-4 py-2 rounded-full hover:bg-red-500 hover:text-white transition-all font-black">LogOut</a>
+            <a href="{{ url_for('logout') }}" class="bg-red-50 text-red-500 px-4 py-2 rounded-full hover:bg-red-500 hover:text-white transition-all font-black">LogOut</a>
         </div>
     </nav>
 
@@ -37,28 +37,28 @@
         <div id="vista-info" class="py-12 space-y-12 animate-fade-in">
             <div class="max-w-3xl">
                 <h2 class="text-5xl font-light text-slate-800 leading-tight mb-6 italic">Medición fisiológica <br><strong> de sEMG </strong></h2>
-                <p class="text-slate-500 text-lg leading-relaxed">Análisis de señales mioeléctricas para la prevención de atrofia muscular con procesamiento matemático integrado.</p>
+                <p class="text-slate-500 text-lg leading-relaxed">Registro dinámico con marcado de puntos de contracción y vista final de sesión completa.</p>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-center">
+                <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
                     <p class="text-[10px] font-black text-blue-600 uppercase mb-2 tracking-widest">Hardware</p>
                     <p class="text-sm font-bold text-slate-700 italic">MyoWare 2.0 & Arduino Uno R4</p>
                 </div>
                 <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
                     <p class="text-[10px] font-black text-purple-600 uppercase mb-2 tracking-widest">Métrica RMS</p>
-                    <p class="text-[11px] text-slate-500 italic">Root Mean Square: Potencia de contracción.</p>
+                    <p class="text-[11px] text-slate-500 italic">Potencia promedio de la señal.</p>
                 </div>
                 <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
                     <p class="text-[10px] font-black text-cyan-600 uppercase mb-2 tracking-widest">Métrica ARV</p>
-                    <p class="text-[11px] text-slate-500 italic">Average Rectified Value: Reclutamiento motor.</p>
+                    <p class="text-[11px] text-slate-500 italic">Nivel de reclutamiento muscular.</p>
                 </div>
             </div>
 
             <button onclick="openControlPopup()" class="w-full bg-blue-600 p-8 rounded-[32px] text-white shadow-2xl flex justify-between items-center hover:scale-[1.01] transition-transform">
                 <div class="text-left">
                     <h3 class="text-xl font-bold italic uppercase tracking-tighter">Nueva Sesión de Lectura</h3>
-                    <p class="text-sm opacity-80 font-medium">Inicia el monitoreo con umbral de detección del 60%.</p>
+                    <p class="text-sm opacity-80 font-medium">Marcado de puntos y visualización completa al finalizar.</p>
                 </div>
                 <span class="bg-white text-blue-600 px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest">Comenzar</span>
             </button>
@@ -67,64 +67,50 @@
         <div id="vista-monitor" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6 animate-fade-in">
             <div class="lg:col-span-3 space-y-4">
                 <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 text-center">
-                    <h3 class="text-[10px] font-black text-slate-400 uppercase mb-4 tracking-widest">Repeticiones</h3>
-                    <p id="main-counter" class="text-7xl font-light text-blue-600 transition-all duration-200">0</p>
+                    <h3 class="text-[10px] font-black text-slate-400 uppercase mb-4 tracking-widest">Contador</h3>
+                    <p id="main-counter" class="text-7xl font-light text-blue-600">0</p>
                     <div class="w-full bg-slate-100 h-2 rounded-full mt-4 overflow-hidden">
                         <div id="global-progress" class="bg-blue-600 h-full w-0 transition-all duration-700"></div>
                     </div>
                 </div>
 
                 <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 space-y-3">
-                    <h3 class="text-[9px] font-black text-slate-400 uppercase tracking-widest text-center italic">Log de Contracciones</h3>
+                    <h3 class="text-[9px] font-black text-slate-400 uppercase tracking-widest text-center italic">Timestamps de Repetición</h3>
                     <div class="max-h-40 overflow-y-auto pr-1" id="rep-table-body">
                         <table class="w-full text-[10px] text-left">
-                            <tbody id="table-entries" class="divide-y divide-slate-50">
-                                </tbody>
+                            <tbody id="table-entries" class="divide-y divide-slate-50"></tbody>
                         </table>
                     </div>
                 </div>
 
                 <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 space-y-3">
-                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Información (Opcional)</h3>
-                    <input type="text" id="paciente-id" placeholder="Nombre o ID Paciente" class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] italic focus:ring-2 focus:ring-blue-500/20 outline-none">
-                    <input type="text" id="doctor-id" placeholder="Médico / Investigador" class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] italic focus:ring-2 focus:ring-blue-500/20 outline-none">
+                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Datos de Sesión</h3>
+                    <input type="text" id="paciente-id" placeholder="ID Paciente" class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] italic focus:ring-2 focus:ring-blue-500/20 outline-none">
+                    <input type="text" id="doctor-id" placeholder="Médico" class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] italic focus:ring-2 focus:ring-blue-500/20 outline-none">
                 </div>
 
                 <div class="space-y-2">
-                    <button id="btn-download" onclick="descargarCSV()" class="w-full py-4 bg-emerald-500 text-white rounded-2xl text-[9px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-50">
-                        Exportar CSV ⤓
-                    </button>
-                    <button onclick="requestReset()" class="w-full py-4 border-2 border-dashed border-slate-200 rounded-2xl text-[9px] font-black text-slate-400 hover:text-blue-500 transition-all uppercase tracking-widest">
-                        Reiniciar ↺
-                    </button>
-                    <button onclick="requestReset()" class="w-full py-4 bg-slate-100 rounded-2xl text-[9px] font-black text-slate-500 hover:bg-red-50 hover:text-red-600 transition-all uppercase flex items-center justify-center gap-2">
-                        Finalizar Sesión
-                    </button>
+                    <button onclick="descargarCSV()" class="w-full py-4 bg-emerald-500 text-white rounded-2xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-emerald-50">Exportar CSV ⤓</button>
+                    <button onclick="location.reload()" class="w-full py-4 border-2 border-dashed border-slate-200 rounded-2xl text-[9px] font-black text-slate-400 hover:text-blue-500 transition-all uppercase tracking-widest">Reiniciar ↺</button>
                 </div>
             </div>
 
             <div class="lg:col-span-9 space-y-6">
                 <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
-                    <h3 class="text-[10px] font-black text-slate-400 uppercase mb-4 tracking-widest">Señal Cruda (RAW) + Umbral 60%</h3>
+                    <h3 id="chart-title" class="text-[10px] font-black text-slate-400 uppercase mb-4 tracking-widest italic">Señal RAW en Tiempo Real</h3>
                     <div class="h-80"><canvas id="rawChart"></canvas></div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 h-64 flex flex-col">
-                        <h3 class="text-[10px] font-black text-purple-600 uppercase mb-4 italic tracking-widest">Valor RMS</h3>
-                        <div id="container-rms-chart" class="flex-1"><canvas id="rmsChart"></canvas></div>
-                        <div id="result-rms" class="hidden flex-1 flex flex-col justify-center items-center">
-                            <span id="value-rms" class="text-7xl font-light text-purple-600">0.00</span>
-                            <span class="text-[10px] font-bold text-slate-400 uppercase mt-2">Microvoltios (mV)</span>
-                        </div>
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 h-64 flex flex-col items-center justify-center text-center">
+                        <h3 class="text-[10px] font-black text-purple-600 uppercase mb-4 tracking-widest italic">RMS</h3>
+                        <div id="value-rms" class="text-7xl font-light text-purple-600">--</div>
+                        <span class="text-[9px] font-bold text-slate-400 uppercase mt-2">Microvoltios (uV)</span>
                     </div>
-                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 h-64 flex flex-col">
-                        <h3 class="text-[10px] font-black text-cyan-600 uppercase mb-4 italic tracking-widest">Valor ARV</h3>
-                        <div id="container-arv-chart" class="flex-1"><canvas id="arsChart"></canvas></div>
-                        <div id="result-arv" class="hidden flex-1 flex flex-col justify-center items-center">
-                            <span id="value-arv" class="text-7xl font-light text-cyan-600">0.00</span>
-                            <span class="text-[10px] font-bold text-slate-400 uppercase mt-2">Microvoltios (mV)</span>
-                        </div>
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 h-64 flex flex-col items-center justify-center text-center">
+                        <h3 class="text-[10px] font-black text-cyan-600 uppercase mb-4 tracking-widest italic">ARV</h3>
+                        <div id="value-arv" class="text-7xl font-light text-cyan-600">--</div>
+                        <span class="text-[9px] font-bold text-slate-400 uppercase mt-2">Microvoltios (uV)</span>
                     </div>
                 </div>
             </div>
@@ -137,16 +123,16 @@
             <div class="space-y-4 mb-10">
                 <label class="flex items-center gap-4 p-5 border border-slate-100 rounded-2xl cursor-pointer hover:bg-slate-50 transition">
                     <input type="checkbox" class="step-check w-5 h-5 accent-blue-600">
-                    <span class="text-sm text-slate-600 italic">Electrodos colocados en vientre muscular</span>
+                    <span class="text-sm text-slate-600 italic">Electrodos en vientre muscular</span>
                 </label>
                 <label class="flex items-center gap-4 p-5 border border-slate-100 rounded-2xl cursor-pointer hover:bg-slate-50 transition">
                     <input type="checkbox" class="step-check w-5 h-5 accent-blue-600">
-                    <span class="text-sm text-slate-600 italic">Referencia conectada en zona ósea</span>
+                    <span class="text-sm text-slate-600 italic">Referencia conectada en codo/hueso</span>
                 </label>
             </div>
             <div class="flex gap-4">
                 <button onclick="closeControlPopup()" class="flex-1 py-4 text-[10px] font-black uppercase text-slate-400">Cancelar</button>
-                <button id="btn-start-global" disabled onclick="startGlobalSession()" class="flex-[2] bg-slate-200 text-slate-400 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all">Empezar Lectura</button>
+                <button id="btn-start-global" disabled onclick="startGlobalSession()" class="flex-[2] bg-blue-600 text-white py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-100">Empezar</button>
             </div>
         </div>
     </div>
@@ -154,9 +140,11 @@
     <script>
         let isRecording = false;
         let count = 0;
-        let allRawData = []; 
+        let allRawLabels = []; 
+        let allRawValues = []; 
         let canCountRep = true;
 
+        // Configuración de Anotaciones (Línea de Umbral)
         const annotationsConfig = {
             thresholdLine: {
                 type: 'line', yMin: 60, yMax: 60,
@@ -181,96 +169,119 @@
         const rawChartCtx = document.getElementById('rawChart').getContext('2d');
         const rawChart = new Chart(rawChartCtx, {
             type: 'line',
-            data: { labels: [], datasets: [{ data: [], borderColor: '#2563eb', borderWidth: 2, pointRadius: 0, fill: false, tension: 0.4 }] },
+            data: { 
+                labels: [], 
+                datasets: [
+                    { 
+                        label: 'sEMG Raw',
+                        data: [], 
+                        borderColor: '#2563eb', 
+                        borderWidth: 2, 
+                        pointRadius: 0, 
+                        fill: false, 
+                        tension: 0.3 
+                    },
+                    {
+                        label: 'Marcador',
+                        data: [],
+                        backgroundColor: '#ef4444',
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        showLine: false // Para que sean solo puntos
+                    }
+                ] 
+            },
             options: {
                 responsive: true, maintainAspectRatio: false,
                 plugins: { legend: { display: false }, annotation: { annotations: annotationsConfig } },
-                scales: { x: { display: false }, y: { min: 0, max: 100, grid: { color: '#f1f5f9' } } }
+                scales: { x: { display: false }, y: { min: 0, max: 110, grid: { color: '#f1f5f9' } } }
             }
         });
-
-        const baseConfig = (color) => ({
-            type: 'line',
-            data: { labels: [], datasets: [{ data: [], borderColor: color, borderWidth: 2, pointRadius: 0, fill: false, tension: 0.4 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { beginAtZero: true, grid: { color: '#f1f5f9' } } } }
-        });
-        const rmsChart = new Chart(document.getElementById('rmsChart').getContext('2d'), baseConfig('#9333ea'));
-        const arsChart = new Chart(document.getElementById('arsChart').getContext('2d'), baseConfig('#0891b2'));
 
         setInterval(() => {
             if (!isRecording) return;
             
             const rawVal = Math.random() * 100;
             const time = new Date().toLocaleTimeString('es-MX', { hour12: false });
-            allRawData.push({ t: time, v: rawVal.toFixed(2) });
 
-            [rawChart, rmsChart, arsChart].forEach((chart, i) => {
-                const val = [rawVal, rawVal*0.7, rawVal*0.4][i];
-                if (chart.data.labels.length > 40 && count < 10) { 
-                    chart.data.labels.shift(); 
-                    chart.data.datasets[0].data.shift(); 
-                }
-                chart.data.labels.push(time);
-                chart.data.datasets[0].data.push(val);
-                chart.update('none');
-            });
+            // Guardar para el histórico total
+            allRawLabels.push(time);
+            allRawValues.push(rawVal);
 
+            // Actualizar gráfica en tiempo real (ventana de 50 puntos)
+            rawChart.data.labels.push(time);
+            rawChart.data.datasets[0].data.push(rawVal);
+            rawChart.data.datasets[1].data.push(null); // Espacio vacío para el marcador si no hay rep
+
+            if (rawChart.data.labels.length > 50) {
+                rawChart.data.labels.shift();
+                rawChart.data.datasets[0].data.shift();
+                rawChart.data.datasets[1].data.shift();
+            }
+
+            // DETECCIÓN DE REPETICIÓN
             if(rawVal > 60 && canCountRep && count < 10) {
                 count++;
                 canCountRep = false;
                 document.getElementById('main-counter').innerText = count;
                 document.getElementById('global-progress').style.width = (count * 10) + "%";
 
-                // Línea Vertical en Gráfica
-                rawChart.options.plugins.annotation.annotations['rep' + count] = {
-                    type: 'line', xMin: rawChart.data.labels.length - 1, xMax: rawChart.data.labels.length - 1,
-                    borderColor: '#2563eb', borderWidth: 2,
-                    label: { display: true, content: 'R' + count, position: 'start', backgroundColor: '#2563eb', color: 'white', font: { size: 10, weight: 'bold' } }
-                };
+                // Poner el punto en la gráfica (Marcador rojo)
+                rawChart.data.datasets[1].data[rawChart.data.datasets[1].data.length - 1] = rawVal;
 
-                // Nueva Fila en Tabla
+                // Fila en Tabla
                 const tableBody = document.getElementById('table-entries');
-                const row = `<tr class="animate-fade-in"><td class="py-2 font-bold text-slate-700">Rep ${count}</td><td class="py-2 text-right font-mono text-blue-600">${time}</td></tr>`;
-                tableBody.innerHTML = row + tableBody.innerHTML;
+                tableBody.innerHTML = `<tr class="animate-fade-in"><td class="py-2 font-bold text-slate-700">Rep ${count}</td><td class="py-2 text-right font-mono text-blue-600">${time}</td></tr>` + tableBody.innerHTML;
 
                 if(count === 10) { 
                     isRecording = false; 
-                    finalizarProtocoloMatematico(); 
+                    finalizarYExpandirGrafica(); 
                 }
             } else if (rawVal < 25) {
                 canCountRep = true; 
             }
-        }, 800);
+            
+            rawChart.update('none');
+        }, 150); // Un poco más rápido para fluidez
 
-        function finalizarProtocoloMatematico() {
-            const dataVals = allRawData.map(d => parseFloat(d.v));
-            const n = dataVals.length;
-            const rms = Math.sqrt(dataVals.reduce((sum, v) => sum + v*v, 0) / n);
-            const arv = dataVals.reduce((sum, v) => sum + Math.abs(v), 0) / n;
-            document.getElementById('container-rms-chart').classList.add('hidden');
-            document.getElementById('container-arv-chart').classList.add('hidden');
-            document.getElementById('result-rms').classList.remove('hidden');
-            document.getElementById('result-arv').classList.remove('hidden');
+        function finalizarYExpandirGrafica() {
+            // Cambiar estado visual
+            document.getElementById('status-text').innerText = "✓ ANÁLISIS COMPLETADO";
+            document.getElementById('chart-title').innerText = "VISTA COMPLETA DE LA SESIÓN (10 REPS)";
+            
+            // 1. Cargar TODOS los datos en la gráfica
+            rawChart.data.labels = allRawLabels;
+            rawChart.data.datasets[0].data = allRawValues;
+            
+            // Re-mapear los puntos rojos (marcadores) en el histórico total
+            // (Para efectos de esta simulación rápida, solo mostramos la línea completa)
+            rawChart.data.datasets[1].data = new Array(allRawValues.length).fill(null);
+            
+            // Ajustar escalas para ver todo
+            rawChart.options.scales.x.display = true; // Mostrar eje tiempo al final
+            rawChart.update();
+
+            // 2. Cálculos matemáticos
+            const n = allRawValues.length;
+            const rms = Math.sqrt(allRawValues.reduce((sum, v) => sum + v*v, 0) / n);
+            const arv = allRawValues.reduce((sum, v) => sum + Math.abs(v), 0) / n;
+            
             document.getElementById('value-rms').innerText = rms.toFixed(2);
-            document.getElementById('value-arv').innerText = arv.innerText = arv.toFixed(2);
-            document.getElementById('status-text').innerText = "✓ SESIÓN COMPLETADA";
+            document.getElementById('value-arv').innerText = arv.toFixed(2);
         }
 
         function descargarCSV() {
             const pac = document.getElementById('paciente-id').value || "Paciente";
-            let csv = "data:text/csv;charset=utf-8,Evento,Timestamp\n";
-            document.querySelectorAll('#table-entries tr').forEach(tr => {
-                const tds = tr.querySelectorAll('td');
-                csv += `${tds[0].innerText},${tds[1].innerText}\n`;
+            let csv = "data:text/csv;charset=utf-8,Tiempo,Amplitud_uV\n";
+            allRawLabels.forEach((t, i) => {
+                csv += `${t},${allRawValues[i].toFixed(2)}\n`;
             });
             const link = document.createElement("a");
             link.setAttribute("href", encodeURI(csv));
-            link.setAttribute("download", `Log_sEMG_${pac}.csv`);
+            link.setAttribute("download", `Sesion_Completa_sEMG_${pac}.csv`);
             link.click();
         }
 
-        function requestReset() { location.reload(); }
-        
         const checks = document.querySelectorAll('.step-check');
         const startBtn = document.getElementById('btn-start-global');
         checks.forEach(c => c.addEventListener('change', () => {
