@@ -12,8 +12,41 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         #rep-table-body::-webkit-scrollbar { width: 4px; }
         #rep-table-body::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-        /* Clase personalizada para el Baby Pink */
         .bg-baby-pink { background-color: #feb9cf; }
+
+        /* Estilos para el efecto Quizlet (Flip Card) */
+        .flip-card {
+            background-color: transparent;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 1.5rem; /* 3xl */
+        }
+        .flip-card-back {
+            transform: rotateY(180deg);
+            padding: 1.5rem;
+        }
     </style>
 </head>
 <body class="bg-[#F8FAFC] text-slate-900 font-sans">
@@ -35,7 +68,6 @@
     </div>
 
     <main class="max-w-7xl mx-auto p-6">
-        
         <div id="vista-info" class="py-12 space-y-12 animate-fade-in">
             <div class="max-w-3xl">
                 <h2 class="text-5xl font-light text-slate-800 leading-tight mb-6 italic">Medición fisiológica <br><strong> de sEMG </strong></h2>
@@ -49,11 +81,11 @@
                 </div>
                 <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
                     <p class="text-[10px] font-black text-purple-600 uppercase mb-2 tracking-widest">Métrica RMS</p>
-                    <p class="text-[11px] text-slate-500 italic">Potencia promedio de la señal, unidades en mV (microVolts).</p>
+                    <p class="text-[11px] text-slate-500 italic">Potencia promedio de la señal.</p>
                 </div>
                 <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
                     <p class="text-[10px] font-black text-cyan-600 uppercase mb-2 tracking-widest">Métrica ARV</p>
-                    <p class="text-[11px] text-slate-500 italic">Nivel de reclutamiento muscular, unidades en mV (microVolts).</p>
+                    <p class="text-[11px] text-slate-500 italic">Nivel de reclutamiento muscular.</p>
                 </div>
             </div>
 
@@ -86,7 +118,7 @@
                 </div>
 
                 <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 space-y-3">
-                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Información de Sesión (Opcionales) </h3>
+                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Información de Sesión</h3>
                     <input type="text" id="paciente-id" placeholder="ID Paciente" class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] italic focus:ring-2 focus:ring-blue-500/20 outline-none">
                     <input type="text" id="doctor-id" placeholder="Personal de salud encargado" class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] italic focus:ring-2 focus:ring-blue-500/20 outline-none">
                 </div>
@@ -104,15 +136,38 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 h-64 flex flex-col items-center justify-center text-center">
-                        <h3 class="text-[10px] font-black text-purple-600 uppercase mb-4 tracking-widest italic">RMS</h3>
-                        <div id="value-rms" class="text-7xl font-light text-purple-600">--</div>
-                        <span class="text-[9px] font-bold text-slate-400 uppercase mt-2">Microvoltios (mV)</span>
+                    <div class="flip-card h-64 w-full" onclick="this.classList.toggle('flipped')">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front bg-white shadow-sm border border-slate-100">
+                                <h3 class="text-[10px] font-black text-purple-600 uppercase mb-4 tracking-widest italic">RMS</h3>
+                                <div id="value-rms" class="text-7xl font-light text-purple-600">--</div>
+                                <span class="text-[9px] font-bold text-slate-400 uppercase mt-2">Microvoltios (mV)</span>
+                                <p class="text-[8px] text-slate-300 mt-4 uppercase">Haz clic para info ↻</p>
+                            </div>
+                            <div class="flip-card-back bg-purple-600 text-white shadow-xl">
+                                <h3 class="text-xs font-black uppercase mb-2 tracking-widest">¿Qué es RMS?</h3>
+                                <p class="text-[11px] italic leading-relaxed">Representa la raíz de la media cuadrática. Es una medida de la <strong>potencia de la señal</strong> sEMG.</p>
+                                <div class="h-[1px] w-12 bg-white/30 my-3"></div>
+                                <p class="text-[11px]">Interpretación: A mayor RMS, existe una mayor actividad eléctrica total en el músculo.</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 h-64 flex flex-col items-center justify-center text-center">
-                        <h3 class="text-[10px] font-black text-cyan-600 uppercase mb-4 tracking-widest italic">ARV</h3>
-                        <div id="value-arv" class="text-7xl font-light text-cyan-600">--</div>
-                        <span class="text-[9px] font-bold text-slate-400 uppercase mt-2">Microvoltios (mV)</span>
+
+                    <div class="flip-card h-64 w-full" onclick="this.classList.toggle('flipped')">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front bg-white shadow-sm border border-slate-100">
+                                <h3 class="text-[10px] font-black text-cyan-600 uppercase mb-4 tracking-widest italic">ARV</h3>
+                                <div id="value-arv" class="text-7xl font-light text-cyan-600">--</div>
+                                <span class="text-[9px] font-bold text-slate-400 uppercase mt-2">Microvoltios (mV)</span>
+                                <p class="text-[8px] text-slate-300 mt-4 uppercase">Haz clic para info ↻</p>
+                            </div>
+                            <div class="flip-card-back bg-cyan-600 text-white shadow-xl">
+                                <h3 class="text-xs font-black uppercase mb-2 tracking-widest">¿Qué es ARV?</h3>
+                                <p class="text-[11px] italic leading-relaxed">Es el Valor Rectificado Promedio. Mide el área bajo la señal sEMG rectificada.</p>
+                                <div class="h-[1px] w-12 bg-white/30 my-3"></div>
+                                <p class="text-[11px]">Interpretación: Refleja el <strong>nivel de reclutamiento</strong> de unidades motoras durante la contracción.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -162,7 +217,6 @@
             closeControlPopup();
             document.getElementById('vista-info').classList.add('hidden');
             document.getElementById('vista-monitor').classList.remove('hidden');
-            // CAMBIO: Baby Pink #feb9cf
             document.getElementById('global-status-bar').style.backgroundColor = "#feb9cf";
             document.getElementById('status-text').innerText = "● REGISTRO EN VIVO";
             document.getElementById('status-text').classList.replace('text-slate-500', 'text-white');
@@ -200,7 +254,6 @@
                 scales: { 
                     x: { 
                         display: true,
-                        // CAMBIO: Quitar timestamps (labels), dejar solo título de eje
                         ticks: { display: false },
                         grid: { display: false },
                         title: { display: true, text: 'Tiempo (ms)', font: { size: 10, weight: 'bold' } }
@@ -216,7 +269,6 @@
 
         setInterval(() => {
             if (!isRecording) return;
-            
             const rawVal = Math.random() * 100;
             const time = new Date().toLocaleTimeString('es-MX', { hour12: false });
 
@@ -239,7 +291,6 @@
                 repMarkerIndices.push(allRawValues.length - 1); 
                 document.getElementById('main-counter').innerText = count;
                 document.getElementById('global-progress').style.width = (count * 10) + "%";
-                
                 rawChart.data.datasets[1].data[rawChart.data.datasets[1].data.length - 1] = rawVal;
 
                 const tableBody = document.getElementById('table-entries');
@@ -252,12 +303,11 @@
             } else if (rawVal < 25) {
                 canCountRep = true; 
             }
-            
             rawChart.update('none');
         }, 150);
 
         function finalizarYExpandirGrafica() {
-            document.getElementById('global-status-bar').style.backgroundColor = "#10b981"; // Cambia a esmeralda al finalizar
+            document.getElementById('global-status-bar').style.backgroundColor = "#10b981"; 
             document.getElementById('status-text').innerText = "✓ ANÁLISIS COMPLETADO";
             document.getElementById('chart-title').innerText = "VISTA COMPLETA DE LA SESIÓN (10 REPS)";
             
@@ -287,18 +337,13 @@
                 repMarkerIndices = [];
                 isRecording = true;
                 canCountRep = true;
-
                 document.getElementById('main-counter').innerText = "0";
                 document.getElementById('global-progress').style.width = "0%";
                 document.getElementById('table-entries').innerHTML = "";
                 document.getElementById('value-rms').innerText = "--";
                 document.getElementById('value-arv').innerText = "--";
-                document.getElementById('chart-title').innerText = "Señal RAW en Tiempo Real";
-                
                 document.getElementById('global-status-bar').style.backgroundColor = "#feb9cf";
                 document.getElementById('status-text').innerText = "● REGISTRO EN VIVO";
-                document.getElementById('status-text').className = "text-[9px] font-bold uppercase tracking-widest text-white italic text-center";
-
                 rawChart.data.labels = [];
                 rawChart.data.datasets[0].data = [];
                 rawChart.data.datasets[1].data = [];
@@ -309,9 +354,7 @@
         function descargarCSV() {
             const pac = document.getElementById('paciente-id').value || "Paciente";
             let csv = "data:text/csv;charset=utf-8,Tiempo,Amplitud_uV\n";
-            allRawLabels.forEach((t, i) => {
-                csv += `${t},${allRawValues[i].toFixed(2)}\n`;
-            });
+            allRawLabels.forEach((t, i) => { csv += `${t},${allRawValues[i].toFixed(2)}\n`; });
             const link = document.createElement("a");
             link.setAttribute("href", encodeURI(csv));
             link.setAttribute("download", `Sesion_Completa_sEMG_${pac}.csv`);
