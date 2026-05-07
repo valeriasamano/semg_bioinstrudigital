@@ -11,6 +11,10 @@ def home():
 @app.route('/prototipo')
 def prototipo():
     return render_template('prototipo.html')
+@app.route('/')
+@login_required  # <-- Esta línea es la que obliga a pedir login
+def home():
+    return render_template('index.html')
 
 # Si el archivo CSV no existe, lo crea con sus columnas correspondientes
 if not os.path.exists(CSV_FILE):
