@@ -126,7 +126,7 @@
                 </div>
 
                 <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 space-y-3">
-                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Información de Sesión</h3>
+                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Información de Sesión (Opcional)</h3>
                     <input type="text" id="paciente-id" placeholder="ID Paciente" class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] italic focus:ring-2 focus:ring-blue-500/20 outline-none">
                     <input type="text" id="doctor-id" placeholder="Personal de salud encargado" class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] italic focus:ring-2 focus:ring-blue-500/20 outline-none">
                 </div>
@@ -156,7 +156,6 @@
                                 <h3 class="text-[10px] font-black text-purple-600 uppercase mb-4 tracking-widest italic">RMS (Root Mean Square)</h3>
                                 <div id="value-rms" class="text-7xl font-light text-purple-600">--</div>
                                 <span class="text-[9px] font-bold text-slate-400 uppercase mt-2">Milivoltios (mV)</span>
-                                <p class="text-[8px] text-slate-300 mt-4 uppercase">Haz clic para más información ↻</p>
                             </div>
                             <div class="flip-card-back bg-purple-600 text-white shadow-xl">
                                 <h3 class="text-xs font-black uppercase mb-3 tracking-widest border-b border-white/20 pb-2 w-full text-center">¿Qué es RMS?</h3>
@@ -173,7 +172,6 @@
                                 <h3 class="text-[10px] font-black text-cyan-600 uppercase mb-4 tracking-widest italic">ARV (Average Rectified Value)</h3>
                                 <div id="value-arv" class="text-7xl font-light text-cyan-600">--</div>
                                 <span class="text-[9px] font-bold text-slate-400 uppercase mt-2">Milivoltios (mV)</span>
-                                <p class="text-[8px] text-slate-300 mt-4 uppercase">Haz clic para más información ↻</p>
                             </div>
                             <div class="flip-card-back bg-cyan-600 text-white shadow-xl">
                                 <h3 class="text-xs font-black uppercase mb-3 tracking-widest border-b border-white/20 pb-2 w-full text-center">¿Qué es ARV?</h3>
@@ -196,21 +194,12 @@
                     <input type="checkbox" class="step-check w-5 h-5 rounded-lg border-slate-200 text-blue-600 focus:ring-blue-500 accent-blue-600">
                     <div class="flex flex-col">
                         <span class="text-sm font-bold text-slate-700">Limpieza de piel</span>
-                        <span class="text-[10px] text-slate-400 italic uppercase">Uso de alcohol isopropílico</span>
                     </div>
                 </label>
                 <label class="flex items-center gap-4 p-5 border border-slate-100 rounded-2xl cursor-pointer hover:bg-slate-50 transition-all">
                     <input type="checkbox" class="step-check w-5 h-5 rounded-lg border-slate-200 text-blue-600 focus:ring-blue-500 accent-blue-600">
                     <div class="flex flex-col">
                         <span class="text-sm font-bold text-slate-700">Colocación de Electrodos</span>
-                        <span class="text-[10px] text-slate-400 italic uppercase">En el vientre del músculo objetivo</span>
-                    </div>
-                </label>
-                <label class="flex items-center gap-4 p-5 border border-slate-100 rounded-2xl cursor-pointer hover:bg-slate-50 transition-all">
-                    <input type="checkbox" class="step-check w-5 h-5 rounded-lg border-slate-200 text-blue-600 focus:ring-blue-500 accent-blue-600">
-                    <div class="flex flex-col">
-                        <span class="text-sm font-bold text-slate-700">Referencia de Tierra</span>
-                        <span class="text-[10px] text-slate-400 italic uppercase">Codo o zona ósea sin músculo</span>
                     </div>
                 </label>
             </div>
@@ -247,7 +236,7 @@
             document.getElementById('vista-info').classList.add('hidden');
             document.getElementById('vista-monitor').classList.remove('hidden');
             document.getElementById('global-status-bar').style.backgroundColor = "#feb9cf"; // Baby Pink
-            document.getElementById('status-text').innerText = "● REGISTRO EN VIVO";
+            document.getElementById('status-text').innerText = "REGISTRO EN VIVO";
             document.getElementById('status-text').classList.replace('text-slate-500', 'text-white');
             document.getElementById('status-indicator').classList.replace('bg-slate-300', 'bg-white');
             isRecording = true;
@@ -330,7 +319,7 @@
 
         function finalizarYExpandirGrafica() {
             document.getElementById('global-status-bar').style.backgroundColor = "#10b981"; 
-            document.getElementById('status-text').innerText = "✓ ANÁLISIS COMPLETADO";
+            document.getElementById('status-text').innerText = "ANÁLISIS COMPLETADO";
             document.getElementById('chart-title').innerText = "SESIÓN COMPLETA - ANÁLISIS DE DATOS";
             
             rawChart.data.labels = allRawLabels;
@@ -370,7 +359,7 @@
 
                 // Resetear barra de estado (Volver a Baby Pink)
                 document.getElementById('global-status-bar').style.backgroundColor = "#feb9cf";
-                document.getElementById('status-text').innerText = "● REGISTRO EN VIVO";
+                document.getElementById('status-text').innerText = "REGISTRO EN VIVO";
                 document.getElementById('status-text').className = "text-[9px] font-bold uppercase tracking-widest text-white italic text-center";
                 document.getElementById('status-indicator').className = "w-2 h-2 rounded-full bg-white animate-pulse";
 
@@ -383,7 +372,7 @@
         }
 
         function descargarCSV() {
-            const pac = document.getElementById('paciente-id').value || "Paciente";
+            const pac = document.getElementById('paciente-id').value || "Paciente ID";
             let csv = "data:text/csv;charset=utf-8,Timestamp,Valor_mV\n";
             allRawLabels.forEach((t, i) => { csv += `${t},${allRawValues[i].toFixed(2)}\n`; });
             const encodedUri = encodeURI(csv);
