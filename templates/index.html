@@ -12,41 +12,12 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         #rep-table-body::-webkit-scrollbar { width: 4px; }
         #rep-table-body::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-        .bg-baby-pink { background-color: #feb9cf; }
-
-        /* Estilos para el efecto Quizlet (Flip Card) */
-        .flip-card {
-            background-color: transparent;
-            perspective: 1000px;
-            cursor: pointer;
-        }
-        .flip-card-inner {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            text-align: center;
-            transition: transform 0.6s;
-            transform-style: preserve-3d;
-        }
-        .flip-card.flipped .flip-card-inner {
-            transform: rotateY(180deg);
-        }
-        .flip-card-front, .flip-card-back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            -webkit-backface-visibility: hidden;
-            backface-visibility: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            border-radius: 1.5rem; /* 3xl */
-        }
-        .flip-card-back {
-            transform: rotateY(180deg);
-            padding: 1.5rem;
-        }
+        
+        .flip-card { background-color: transparent; perspective: 1000px; cursor: pointer; }
+        .flip-card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
+        .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+        .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 1.5rem; }
+        .flip-card-back { transform: rotateY(180deg); padding: 1.5rem; }
     </style>
 </head>
 <body class="bg-[#F8FAFC] text-slate-900 font-sans">
@@ -59,7 +30,7 @@
         <div class="space-x-8 text-[10px] font-black uppercase tracking-widest flex items-center">
             <a href="/" class="text-blue-600 border-b-2 border-blue-600 pb-1">Monitor</a>
             <a href="/prototipo" class="text-slate-400 hover:text-blue-600 transition">Prototipo</a>
-            <a href="{{ url_for('logout') }}" class="bg-red-50 text-red-500 px-4 py-2 rounded-full hover:bg-red-500 hover:text-white transition-all font-black">LogOut</a>
+            <a href="#" class="bg-red-50 text-red-500 px-4 py-2 rounded-full font-black">LogOut</a>
         </div>
     </nav>
 
@@ -73,22 +44,6 @@
                 <h2 class="text-5xl font-light text-slate-800 leading-tight mb-6 italic">Medición fisiológica <br><strong> de sEMG </strong></h2>
                 <p class="text-slate-500 text-lg leading-relaxed">Registro dinámico con marcado de puntos de contracción y vista final de sesión completa.</p>
             </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
-                    <p class="text-[10px] font-black text-blue-600 uppercase mb-2 tracking-widest">Hardware</p>
-                    <p class="text-sm font-bold text-slate-700 italic">MyoWare 2.0 & Arduino Uno R4</p>
-                </div>
-                <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
-                    <p class="text-[10px] font-black text-purple-600 uppercase mb-2 tracking-widest">Métrica RMS</p>
-                    <p class="text-[11px] text-slate-500 italic">Potencia promedio de la señal.</p>
-                </div>
-                <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
-                    <p class="text-[10px] font-black text-cyan-600 uppercase mb-2 tracking-widest">Métrica ARV</p>
-                    <p class="text-[11px] text-slate-500 italic">Nivel de reclutamiento muscular.</p>
-                </div>
-            </div>
-
             <button onclick="openControlPopup()" class="w-full bg-blue-600 p-8 rounded-[32px] text-white shadow-2xl flex justify-between items-center hover:scale-[1.01] transition-transform">
                 <div class="text-left">
                     <h3 class="text-xl font-bold italic uppercase tracking-tighter">Nueva Sesión de Lectura</h3>
@@ -109,18 +64,10 @@
                 </div>
 
                 <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 space-y-3">
-                    <h3 class="text-[9px] font-black text-slate-400 uppercase tracking-widest text-center italic">Timestamps de Repetición</h3>
+                    <h3 class="text-[9px] font-black text-slate-400 uppercase tracking-widest text-center italic text-slate-300">Timestamps</h3>
                     <div class="max-h-40 overflow-y-auto pr-1" id="rep-table-body">
-                        <table class="w-full text-[10px] text-left">
-                            <tbody id="table-entries" class="divide-y divide-slate-50"></tbody>
-                        </table>
+                        <table class="w-full text-[10px] text-left"><tbody id="table-entries" class="divide-y divide-slate-50"></tbody></table>
                     </div>
-                </div>
-
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 space-y-3">
-                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Información de Sesión</h3>
-                    <input type="text" id="paciente-id" placeholder="ID Paciente" class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] italic focus:ring-2 focus:ring-blue-500/20 outline-none">
-                    <input type="text" id="doctor-id" placeholder="Personal de salud encargado" class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] italic focus:ring-2 focus:ring-blue-500/20 outline-none">
                 </div>
 
                 <div class="space-y-2">
@@ -141,14 +88,14 @@
                             <div class="flip-card-front bg-white shadow-sm border border-slate-100">
                                 <h3 class="text-[10px] font-black text-purple-600 uppercase mb-4 tracking-widest italic">RMS</h3>
                                 <div id="value-rms" class="text-7xl font-light text-purple-600">--</div>
-                                <span class="text-[9px] font-bold text-slate-400 uppercase mt-2">Microvoltios (mV)</span>
+                                <span class="text-[9px] font-bold text-slate-400 uppercase mt-2">Milivoltios (mV)</span>
                                 <p class="text-[8px] text-slate-300 mt-4 uppercase">Haz clic para info ↻</p>
                             </div>
                             <div class="flip-card-back bg-purple-600 text-white shadow-xl">
                                 <h3 class="text-xs font-black uppercase mb-2 tracking-widest">¿Qué es RMS?</h3>
-                                <p class="text-[11px] italic leading-relaxed">Representa la raíz de la media cuadrática. Es una medida de la <strong>potencia de la señal</strong> sEMG.</p>
+                                <p class="text-[11px] italic leading-relaxed">Representa la raíz de la media cuadrática. Es una medida de la <strong>potencia de la señal</strong>.</p>
                                 <div class="h-[1px] w-12 bg-white/30 my-3"></div>
-                                <p class="text-[11px]">Interpretación: A mayor RMS, existe una mayor actividad eléctrica total en el músculo.</p>
+                                <p class="text-[11px]">Interpretación: Refleja el estado de fatiga y la intensidad de la contracción muscular.</p>
                             </div>
                         </div>
                     </div>
@@ -158,14 +105,14 @@
                             <div class="flip-card-front bg-white shadow-sm border border-slate-100">
                                 <h3 class="text-[10px] font-black text-cyan-600 uppercase mb-4 tracking-widest italic">ARV</h3>
                                 <div id="value-arv" class="text-7xl font-light text-cyan-600">--</div>
-                                <span class="text-[9px] font-bold text-slate-400 uppercase mt-2">Microvoltios (mV)</span>
+                                <span class="text-[9px] font-bold text-slate-400 uppercase mt-2">Milivoltios (mV)</span>
                                 <p class="text-[8px] text-slate-300 mt-4 uppercase">Haz clic para info ↻</p>
                             </div>
                             <div class="flip-card-back bg-cyan-600 text-white shadow-xl">
                                 <h3 class="text-xs font-black uppercase mb-2 tracking-widest">¿Qué es ARV?</h3>
-                                <p class="text-[11px] italic leading-relaxed">Es el Valor Rectificado Promedio. Mide el área bajo la señal sEMG rectificada.</p>
+                                <p class="text-[11px] italic leading-relaxed">Average Rectified Value. Es el promedio de la señal rectificada (valor absoluto).</p>
                                 <div class="h-[1px] w-12 bg-white/30 my-3"></div>
-                                <p class="text-[11px]">Interpretación: Refleja el <strong>nivel de reclutamiento</strong> de unidades motoras durante la contracción.</p>
+                                <p class="text-[11px]">Interpretación: Útil para observar el <strong>reclutamiento motor</strong> de forma lineal.</p>
                             </div>
                         </div>
                     </div>
@@ -189,7 +136,7 @@
             </div>
             <div class="flex gap-4">
                 <button onclick="closeControlPopup()" class="flex-1 py-4 text-[10px] font-black uppercase text-slate-400">Cancelar</button>
-                <button id="btn-start-global" disabled onclick="startGlobalSession()" class="flex-[2] bg-blue-600 text-white py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-100">Empezar</button>
+                <button id="btn-start-global" disabled onclick="startGlobalSession()" class="flex-[2] bg-blue-600 text-white py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg">Empezar</button>
             </div>
         </div>
     </div>
@@ -229,23 +176,8 @@
             data: { 
                 labels: [], 
                 datasets: [
-                    { 
-                        label: 'sEMG Raw',
-                        data: [], 
-                        borderColor: '#2563eb', 
-                        borderWidth: 2, 
-                        pointRadius: 0, 
-                        fill: false, 
-                        tension: 0.3 
-                    },
-                    {
-                        label: 'Marcador',
-                        data: [],
-                        backgroundColor: '#ef4444',
-                        pointRadius: 6,
-                        pointHoverRadius: 8,
-                        showLine: false 
-                    }
+                    { label: 'sEMG Raw', data: [], borderColor: '#2563eb', borderWidth: 2, pointRadius: 0, fill: false, tension: 0.3 },
+                    { label: 'Marcador', data: [], backgroundColor: '#ef4444', pointRadius: 6, showLine: false }
                 ] 
             },
             options: {
@@ -253,13 +185,19 @@
                 plugins: { legend: { display: false }, annotation: { annotations: annotationsConfig } },
                 scales: { 
                     x: { 
-                        display: true,
-                        ticks: { display: false },
+                        display: true, 
+                        ticks: { display: false }, 
                         grid: { display: false },
                         title: { display: true, text: 'Tiempo (ms)', font: { size: 10, weight: 'bold' } }
                     }, 
                     y: { 
                         min: 0, max: 110, 
+                        display: true, 
+                        ticks: { 
+                            stepSize: 20, 
+                            color: '#94a3b8',
+                            font: { size: 10 }
+                        },
                         grid: { color: '#f1f5f9' },
                         title: { display: true, text: 'Amplitud (mV)', font: { size: 10, weight: 'bold' } }
                     } 
@@ -271,20 +209,16 @@
             if (!isRecording) return;
             const rawVal = Math.random() * 100;
             const time = new Date().toLocaleTimeString('es-MX', { hour12: false });
-
             allRawLabels.push(time);
             allRawValues.push(rawVal);
-
             rawChart.data.labels.push(time);
             rawChart.data.datasets[0].data.push(rawVal);
             rawChart.data.datasets[1].data.push(null); 
-
             if (rawChart.data.labels.length > 50) {
                 rawChart.data.labels.shift();
                 rawChart.data.datasets[0].data.shift();
                 rawChart.data.datasets[1].data.shift();
             }
-
             if(rawVal > 60 && canCountRep && count < 10) {
                 count++;
                 canCountRep = false;
@@ -292,72 +226,41 @@
                 document.getElementById('main-counter').innerText = count;
                 document.getElementById('global-progress').style.width = (count * 10) + "%";
                 rawChart.data.datasets[1].data[rawChart.data.datasets[1].data.length - 1] = rawVal;
-
                 const tableBody = document.getElementById('table-entries');
                 tableBody.innerHTML = `<tr class="animate-fade-in"><td class="py-2 font-bold text-slate-700">Rep ${count}</td><td class="py-2 text-right font-mono text-blue-600">${time}</td></tr>` + tableBody.innerHTML;
-
-                if(count === 10) { 
-                    isRecording = false; 
-                    finalizarYExpandirGrafica(); 
-                }
-            } else if (rawVal < 25) {
-                canCountRep = true; 
-            }
+                if(count === 10) { isRecording = false; finalizarYExpandirGrafica(); }
+            } else if (rawVal < 25) { canCountRep = true; }
             rawChart.update('none');
         }, 150);
 
         function finalizarYExpandirGrafica() {
             document.getElementById('global-status-bar').style.backgroundColor = "#10b981"; 
             document.getElementById('status-text').innerText = "✓ ANÁLISIS COMPLETADO";
-            document.getElementById('chart-title').innerText = "VISTA COMPLETA DE LA SESIÓN (10 REPS)";
-            
             rawChart.data.labels = allRawLabels;
             rawChart.data.datasets[0].data = allRawValues;
-            
             let finalMarkers = new Array(allRawValues.length).fill(null);
-            repMarkerIndices.forEach(idx => {
-                finalMarkers[idx] = allRawValues[idx];
-            });
+            repMarkerIndices.forEach(idx => { finalMarkers[idx] = allRawValues[idx]; });
             rawChart.data.datasets[1].data = finalMarkers;
             rawChart.update();
-
             const n = allRawValues.length;
             const rms = Math.sqrt(allRawValues.reduce((sum, v) => sum + v*v, 0) / n);
             const arv = allRawValues.reduce((sum, v) => sum + Math.abs(v), 0) / n;
-            
             document.getElementById('value-rms').innerText = rms.toFixed(2);
             document.getElementById('value-arv').innerText = arv.toFixed(2);
         }
 
         function requestReset() {
-            if (confirm("¿Estás seguro de que deseas reiniciar la sesión actual?")) {
-                count = 0;
-                allRawLabels = [];
-                allRawValues = [];
-                repMarkerIndices = [];
-                isRecording = true;
-                canCountRep = true;
-                document.getElementById('main-counter').innerText = "0";
-                document.getElementById('global-progress').style.width = "0%";
-                document.getElementById('table-entries').innerHTML = "";
-                document.getElementById('value-rms').innerText = "--";
-                document.getElementById('value-arv').innerText = "--";
-                document.getElementById('global-status-bar').style.backgroundColor = "#feb9cf";
-                document.getElementById('status-text').innerText = "● REGISTRO EN VIVO";
-                rawChart.data.labels = [];
-                rawChart.data.datasets[0].data = [];
-                rawChart.data.datasets[1].data = [];
-                rawChart.update();
+            if (confirm("¿Reiniciar sesión?")) {
+                location.reload();
             }
         }
 
         function descargarCSV() {
-            const pac = document.getElementById('paciente-id').value || "Paciente";
-            let csv = "data:text/csv;charset=utf-8,Tiempo,Amplitud_uV\n";
+            let csv = "data:text/csv;charset=utf-8,Tiempo,Amplitud_mV\n";
             allRawLabels.forEach((t, i) => { csv += `${t},${allRawValues[i].toFixed(2)}\n`; });
             const link = document.createElement("a");
             link.setAttribute("href", encodeURI(csv));
-            link.setAttribute("download", `Sesion_Completa_sEMG_${pac}.csv`);
+            link.setAttribute("download", `Sesion_sEMG_mV.csv`);
             link.click();
         }
 
