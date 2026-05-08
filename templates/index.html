@@ -121,7 +121,7 @@
                     <div class="max-h-40 overflow-y-auto pr-1" id="rep-table-body">
                         <table class="w-full text-[10px] text-left">
                             <tbody id="table-entries" class="divide-y divide-slate-50">
-                                </tbody>
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -350,9 +350,36 @@
             document.getElementById('value-arv').innerText = arv.toFixed(2);
         }
 
+        // --- FUNCIÓN SOLICITADA: REINICIO DE DATOS SIN SALIR ---
         function requestReset() {
-            if (confirm("¿Seguro que deseas reiniciar? Se borrarán los datos actuales.")) {
-                location.reload();
+            if (confirm("¿Seguro que deseas reiniciar la lectura? Se borrarán los datos actuales.")) {
+                // Resetear estado
+                count = 0;
+                allRawLabels = [];
+                allRawValues = [];
+                repMarkerIndices = [];
+                canCountRep = true;
+                isRecording = true; 
+
+                // Resetear UI
+                document.getElementById('main-counter').innerText = "0";
+                document.getElementById('global-progress').style.width = "0%";
+                document.getElementById('table-entries').innerHTML = "";
+                document.getElementById('value-rms').innerText = "--";
+                document.getElementById('value-arv').innerText = "--";
+                document.getElementById('chart-title').innerText = "Señal RAW en Tiempo Real";
+
+                // Resetear barra de estado (Volver a Baby Pink)
+                document.getElementById('global-status-bar').style.backgroundColor = "#feb9cf";
+                document.getElementById('status-text').innerText = "● REGISTRO EN VIVO";
+                document.getElementById('status-text').className = "text-[9px] font-bold uppercase tracking-widest text-white italic text-center";
+                document.getElementById('status-indicator').className = "w-2 h-2 rounded-full bg-white animate-pulse";
+
+                // Resetear Gráfica
+                rawChart.data.labels = [];
+                rawChart.data.datasets[0].data = [];
+                rawChart.data.datasets[1].data = [];
+                rawChart.update();
             }
         }
 
