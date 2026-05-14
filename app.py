@@ -7,12 +7,12 @@ from datetime import datetime
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'biomedica_tec_2026'
+
+# Render usa DATABASE_URL para PostgreSQL. Si no existe, usa SQLite local.
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///database.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
-login_manager = LoginManager(app)
-login_manager.login_view = 'login'
 
 # --- MODELOS ---
 class User(db.Model, UserMixin):
@@ -30,6 +30,14 @@ class SessionRecord(db.Model):
     arv_avg = db.Column(db.Float)
     date_created = db.Column(db.DateTime, default=datetime.now)
 
+# --- CREACIÓN AUTOMÁTICA DE TABLAS ---
+# Esto soluciona el error "relation session_record does not exist" en Render
+with app.app_context():
+    db.create_all()
+
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -41,6 +49,7 @@ def login_google_api():
     email = data.get('email')
     user = User.query.filter_by(username=email).first()
     if not user:
+        # Genera una contraseña aleatoria para usuarios de Google
         hashed_pw = generate_password_hash(os.urandom(24).hex())
         user = User(username=email, password=hashed_pw)
         db.session.add(user)
@@ -86,6 +95,7 @@ def home():
 @app.route('/sesiones')
 @login_required
 def sesiones_pasadas():
+    # Esta consulta ahora funcionará porque la tabla se crea al inicio
     historial = SessionRecord.query.filter_by(user_id=current_user.id).order_by(SessionRecord.date_created.desc()).all()
     return render_template('sesiones.html', sesiones=historial)
 
@@ -105,6 +115,4 @@ def guardar_sesion():
     return jsonify({"success": True})
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
     app.run(debug=True)
