@@ -21,53 +21,43 @@
     </nav>
 
     <main class="max-w-6xl mx-auto mt-12 p-6">
-        <div class="flex justify-between items-end mb-10">
-            <div>
-                <h2 class="text-3xl font-extrabold text-slate-800">Historial de Mediciones</h2>
-                <p class="text-slate-500 mt-2">Consulta los registros guardados de electromiografía de superficie.</p>
-            </div>
-            
-            <a href="/descargar-csv" class="bg-green-600 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-green-700 transition flex items-center gap-2 shadow-lg shadow-green-100">
-                <i class="fa-solid fa-file-csv text-lg"></i>
-                Descargar CSV
-            </a>
-        </div>
+        <header class="mb-10">
+            <h2 class="text-3xl font-extrabold text-slate-800">Historial de Mediciones</h2>
+            <p class="text-slate-500 mt-2">Selecciona una sesión individual para descargar sus datos en formato CSV.</p>
+        </header>
 
         <div class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-slate-50 border-b border-slate-100">
-                        <th class="px-6 py-4 text-xs font-black uppercase tracking-wider text-slate-400">Fecha y Hora</th>
-                        <th class="px-6 py-4 text-xs font-black uppercase tracking-wider text-slate-400">ID Paciente</th>
-                        <th class="px-6 py-4 text-xs font-black uppercase tracking-wider text-slate-400">Médico</th>
-                        <th class="px-6 py-4 text-xs font-black uppercase tracking-wider text-slate-400">RMS Promedio</th>
-                        <th class="px-6 py-4 text-xs font-black uppercase tracking-wider text-slate-400">ARV Promedio</th>
-                        <th class="px-6 py-4 text-xs font-black uppercase tracking-wider text-slate-400 text-center">Acciones</th>
+                        <th class="px-6 py-4 text-xs font-black uppercase text-slate-400">Fecha y Hora</th>
+                        <th class="px-6 py-4 text-xs font-black uppercase text-slate-400">ID Paciente</th>
+                        <th class="px-6 py-4 text-xs font-black uppercase text-slate-400">Médico</th>
+                        <th class="px-6 py-4 text-xs font-black uppercase text-slate-400">RMS</th>
+                        <th class="px-6 py-4 text-xs font-black uppercase text-slate-400">ARV</th>
+                        <th class="px-6 py-4 text-xs font-black uppercase text-slate-400 text-center">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-50">
                     {% for sesion in sesiones %}
                     <tr class="hover:bg-blue-50/30 transition-colors">
-                        <td class="px-6 py-4 text-sm font-medium text-slate-600">
+                        <td class="px-6 py-4 text-sm text-slate-600">
                             {{ sesion.date_created.strftime('%d/%m/%Y %H:%M') }}
                         </td>
                         <td class="px-6 py-4">
-                            <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-md text-xs font-bold">
-                                {{ sesion.patient_id }}
-                            </span>
+                            <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-md text-xs font-bold">{{ sesion.patient_id }}</span>
                         </td>
-                        <td class="px-6 py-4 text-sm text-slate-600">
-                            Dr. {{ sesion.doctor_name }}
-                        </td>
-                        <td class="px-6 py-4 font-mono text-sm text-blue-600 font-bold">
-                            {{ "%.4f"|format(sesion.rms_avg) }} mV
-                        </td>
-                        <td class="px-6 py-4 font-mono text-sm text-indigo-600 font-bold">
-                            {{ "%.4f"|format(sesion.arv_avg) }} mV
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <form action="{{ url_for('borrar_sesion', id=sesion.id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de borrar esta sesión?');">
-                                <button type="submit" class="text-red-300 hover:text-red-600 transition">
+                        <td class="px-6 py-4 text-sm text-slate-600">Dr. {{ sesion.doctor_name }}</td>
+                        <td class="px-6 py-4 font-mono text-sm text-blue-600 font-bold">{{ "%.4f"|format(sesion.rms_avg) }} mV</td>
+                        <td class="px-6 py-4 font-mono text-sm text-indigo-600 font-bold">{{ "%.4f"|format(sesion.arv_avg) }} mV</td>
+                        
+                        <td class="px-6 py-4 flex justify-center items-center gap-4">
+                            <a href="{{ url_for('descargar_sesion', id=sesion.id) }}" class="text-green-500 hover:text-green-700 transition text-lg" title="Descargar CSV">
+                                <i class="fa-solid fa-file-arrow-down"></i>
+                            </a>
+
+                            <form action="{{ url_for('borrar_sesion', id=sesion.id) }}" method="POST" onsubmit="return confirm('¿Eliminar permanentemente este registro?');" class="inline">
+                                <button type="submit" class="text-red-300 hover:text-red-600 transition text-lg" title="Borrar sesión">
                                     <i class="fa-solid fa-trash-can"></i>
                                 </button>
                             </form>
@@ -77,7 +67,7 @@
                     <tr>
                         <td colspan="6" class="px-6 py-20 text-center">
                             <i class="fa-solid fa-folder-open text-slate-200 text-5xl mb-4 block"></i>
-                            <p class="text-slate-400 font-medium">No se han encontrado sesiones registradas.</p>
+                            <p class="text-slate-400 font-medium">No hay registros disponibles.</p>
                         </td>
                     </tr>
                     {% endfor %}
@@ -85,6 +75,5 @@
             </table>
         </div>
     </main>
-
 </body>
 </html>
