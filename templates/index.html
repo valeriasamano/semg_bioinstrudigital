@@ -378,25 +378,25 @@
             const arvVal = document.getElementById('value-arv').innerText;
 
             // 1. Cabecera con Información del Paciente y Personal
-            let csvContent = "INFORME DE SESIÓN sEMG\n";
+            let csvContent = "INFORME DE SESIÓN";
             csvContent += `Paciente ID: ,${pac}\n`;
             csvContent += `Personal encargado: ,${doc}\n`;
             csvContent += `Fecha: ,${new Date().toLocaleDateString()}\n\n`;
 
             // 2. Datos de la Señal
-            csvContent += "REGISTRO DE SEÑAL\n";
+            csvContent += "REGISTRO DE MEDICIONES";
             csvContent += "Timestamp,Valor_mV\n";
             allRawLabels.forEach((t, i) => { 
                 csvContent += `${t},${allRawValues[i].toFixed(2)}\n`; 
             });
 
             // 3. Cálculos de Promedio
-            csvContent += `\nRESUMEN DE MÉTRICAS\n`;
+            csvContent += `\RESUMEN DE RESULTADOS`;
             csvContent += `RMS Promedio (mV): ,${rmsVal}\n`;
             csvContent += `ARV Promedio (mV): ,${arvVal}\n\n`;
 
             // 4. Link de Información
-            csvContent += `Para mayor información visite: ,https://tu-pagina-de-bioinstrumentacion.com\n`;
+            csvContent += `Para mayor información visite: ,https://semg-bioinstrudigital.onrender.com/\n`;
 
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
