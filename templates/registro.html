@@ -60,14 +60,19 @@
         window.loginGoogle = () => {
             const provider = new GoogleAuthProvider();
             signInWithPopup(auth, provider)
-                .then(() => window.location.assign("index.html"))
+                .then(() => {
+                    // REDIRECCIÓN A LA RUTA DE FLASK (RAÍZ)
+                    window.location.assign("/");
+                })
                 .catch((err) => console.error(err));
         };
 
         window.loginMicrosoft = () => {
             const provider = new OAuthProvider('microsoft.com');
             signInWithPopup(auth, provider)
-                .then(() => window.location.assign("index.html"))
+                .then(() => {
+                    window.location.assign("/");
+                })
                 .catch((err) => console.error(err));
         };
     </script>
