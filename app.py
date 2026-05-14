@@ -30,7 +30,6 @@ class SessionRecord(db.Model):
     arv_avg = db.Column(db.Float)
     date_created = db.Column(db.DateTime, default=datetime.now)
 
-# --- CREACIÓN AUTOMÁTICA DE TABLAS ---
 with app.app_context():
     db.create_all()
 
@@ -87,7 +86,6 @@ def sesiones_pasadas():
 @login_required
 def guardar_sesion():
     data = request.json
-    # Ajuste de hora para México (UTC-6)
     mexico_time = datetime.now() - timedelta(hours=6)
     
     nueva_sesion = SessionRecord(
@@ -102,8 +100,6 @@ def guardar_sesion():
     db.session.commit()
     return jsonify({"success": True})
 
-# --- NUEVAS FUNCIONES: BORRAR Y DESCARGAR ---
-
 @app.route('/borrar-sesion/<int:id>', methods=['POST'])
 @login_required
 def borrar_sesion(id):
@@ -113,26 +109,29 @@ def borrar_sesion(id):
         db.session.commit()
     return redirect(url_for('sesiones_pasadas'))
 
-@app.route('/descargar-csv')
+# --- DESCARGA INDIVIDUAL ---
+@app.route('/descargar-sesion/<int:id>')
 @login_required
-def descargar_csv():
+def descargar_sesion(id):
+    s = SessionRecord.query.get_or_404(id)
+    
+    # Seguridad: verificar que la sesión pertenezca al usuario
+    if s.user_id != current_user.id:
+        return "No autorizado", 403
+
     si = StringIO()
     cw = csv.writer(si)
-    cw.writerow(['Fecha', 'ID Paciente', 'Medico', 'RMS Promedio (mV)', 'ARV Promedio (mV)'])
+    cw.writerow(['Parametro', 'Valor'])
+    cw.writerow(['Fecha y Hora', s.date_created.strftime('%d/%m/%Y %H:%M')])
+    cw.writerow(['ID Paciente', s.patient_id])
+    cw.writerow(['Medico responsable', s.doctor_name])
+    cw.writerow(['RMS Promedio (mV)', f"{s.rms_avg:.4f}"])
+    cw.writerow(['ARV Promedio (mV)', f"{s.arv_avg:.4f}"])
     
-    historial = SessionRecord.query.filter_by(user_id=current_user.id).order_by(SessionRecord.date_created.desc()).all()
-    
-    for s in historial:
-        cw.writerow([
-            s.date_created.strftime('%d/%m/%Y %H:%M'),
-            s.patient_id,
-            s.doctor_name,
-            f"{s.rms_avg:.4f}",
-            f"{s.arv_avg:.4f}"
-        ])
+    filename = f"EMG_{s.patient_id}_{s.date_created.strftime('%Y%m%d')}.csv"
     
     output = make_response(si.getvalue())
-    output.headers["Content-Disposition"] = "attachment; filename=historial_emg.csv"
+    output.headers["Content-Disposition"] = f"attachment; filename={filename}"
     output.headers["Content-type"] = "text/csv"
     return output
 
