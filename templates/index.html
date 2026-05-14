@@ -61,130 +61,144 @@
         <div class="space-x-8 text-[10px] font-black uppercase tracking-widest flex items-center">
             <a href="/" class="text-blue-600 border-b-2 border-blue-600 pb-1">Monitor</a>
             <a href="/prototipo" class="text-slate-400 hover:text-blue-600 transition">Prototipo</a>
-            <a href="{{ url_for('logout') }}" class="bg-red-50 text-red-500 px-4 py-2 rounded-full hover:bg-red-500 hover:text-white transition-all font-black">LogOut</a>
+            <!-- Botón de Login/Logout dinámico -->
+            <button id="btn-auth-google" class="bg-red-50 text-red-500 px-4 py-2 rounded-full hover:bg-red-500 hover:text-white transition-all font-black">Cargando...</button>
         </div>
     </nav>
 
-    <div id="global-status-bar" class="bg-slate-100 border-b border-slate-200 py-2 px-8 flex justify-center items-center gap-4 transition-all duration-500">
-        <div id="status-indicator" class="w-2 h-2 rounded-full bg-slate-300 animate-pulse"></div>
-        <p id="status-text" class="text-[9px] font-bold uppercase tracking-widest text-slate-500 italic text-center">Sistema en espera </p>
+    <!-- Contenedor que solo se ve si inicias sesión -->
+    <div id="auth-required-content" style="display: none;">
+        <div id="global-status-bar" class="bg-slate-100 border-b border-slate-200 py-2 px-8 flex justify-center items-center gap-4 transition-all duration-500">
+            <div id="status-indicator" class="w-2 h-2 rounded-full bg-slate-300 animate-pulse"></div>
+            <p id="status-text" class="text-[9px] font-bold uppercase tracking-widest text-slate-500 italic text-center">Sistema en espera </p>
+        </div>
+
+        <main class="max-w-7xl mx-auto p-6">
+            
+            <div id="vista-info" class="py-12 space-y-12 animate-fade-in">
+                <div class="max-w-3xl">
+                    <h2 class="text-5xl font-light text-slate-800 leading-tight mb-6 italic">Medición fisiológica <br><strong> de sEMG </strong></h2>
+                    <p class="text-slate-500 text-lg leading-relaxed">Registro dinámico con marcado automático de puntos de contracción y visualización de métricas de potencia y reclutamiento.</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+                        <p class="text-[10px] font-black text-blue-600 uppercase mb-2 tracking-widest">Hardware</p>
+                        <p class="text-sm font-bold text-slate-700 italic">MyoWare 2.0 & Arduino Uno R4 WiFi</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+                        <p class="text-[10px] font-black text-purple-600 uppercase mb-2 tracking-widest">Métrica RMS</p>
+                        <p class="text-sm font-bold text-slate-700 italic">Root Mean Square</p>
+                        <p class="text-[11px] text-slate-400 mt-2">Cálculo de la potencia promedio de la señal.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+                        <p class="text-[10px] font-black text-cyan-600 uppercase mb-2 tracking-widest">Métrica ARV</p>
+                        <p class="text-sm font-bold text-slate-700 italic">Average Rectified Value</p>
+                        <p class="text-[11px] text-slate-400 mt-2">Nivel de reclutamiento de unidades motoras.</p>
+                    </div>
+                </div>
+
+                <button onclick="openControlPopup()" class="w-full bg-blue-600 p-8 rounded-[32px] text-white shadow-2xl flex justify-between items-center hover:scale-[1.01] transition-all">
+                    <div class="text-left">
+                        <h3 class="text-xl font-bold italic uppercase tracking-tighter">Nueva Sesión de Lectura</h3>
+                        <p class="text-sm opacity-80 font-medium">Inicia el registro en tiempo real con análisis automático.</p>
+                    </div>
+                    <span class="bg-white text-blue-600 px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest">Comenzar</span>
+                </button>
+            </div>
+
+            <div id="vista-monitor" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6 animate-fade-in">
+                
+                <div class="lg:col-span-3 space-y-4">
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 text-center">
+                        <h3 class="text-[10px] font-black text-slate-400 uppercase mb-4 tracking-widest">Contador de Repeticiones</h3>
+                        <p id="main-counter" class="text-7xl font-light text-blue-600">0</p>
+                        <div class="w-full bg-slate-100 h-2 rounded-full mt-4 overflow-hidden">
+                            <div id="global-progress" class="bg-blue-600 h-full w-0 transition-all duration-700"></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 space-y-3">
+                        <h3 class="text-[9px] font-black text-slate-400 uppercase tracking-widest text-center italic">Marcas de Tiempo (s)</h3>
+                        <div class="max-h-40 overflow-y-auto pr-1" id="rep-table-body">
+                            <table class="w-full text-[10px] text-left">
+                                <tbody id="table-entries" class="divide-y divide-slate-50">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 space-y-3">
+                        <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Información de Sesión (Opcional)</h3>
+                        <input type="text" id="paciente-id" placeholder="ID Paciente" class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] italic focus:ring-2 focus:ring-blue-500/20 outline-none">
+                        <input type="text" id="doctor-id" placeholder="Personal de salud encargado" class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] italic focus:ring-2 focus:ring-blue-500/20 outline-none">
+                    </div>
+
+                    <div class="space-y-2">
+                        <button onclick="descargarCSV()" class="w-full py-4 bg-emerald-500 text-white rounded-2xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-emerald-100 hover:bg-emerald-600 transition-all">Exportar Datos Excel (.csv) ⤓</button>
+                        <button onclick="requestReset()" class="w-full py-4 border-2 border-dashed border-slate-200 rounded-2xl text-[9px] font-black text-slate-400 hover:text-blue-500 hover:border-blue-200 transition-all uppercase tracking-widest">Reiniciar Sesión ↺</button>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-9 space-y-6">
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 id="chart-title" class="text-[10px] font-black text-slate-400 uppercase tracking-widest italic text-blue-600">Señal RAW en Tiempo Real</h3>
+                            <div class="flex gap-2">
+                                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                                <span class="w-2 h-2 rounded-full bg-slate-100"></span>
+                            </div>
+                        </div>
+                        <div class="h-80"><canvas id="rawChart"></canvas></div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="flip-card h-64 w-full" onclick="this.classList.toggle('flipped')">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front bg-white shadow-sm border border-slate-100">
+                                    <h3 class="text-[10px] font-black text-purple-600 uppercase mb-4 tracking-widest italic">RMS (Root Mean Square)</h3>
+                                    <div id="value-rms" class="text-7xl font-light text-purple-600">--</div>
+                                    <span class="text-[9px] font-bold text-slate-400 uppercase mt-2">Milivoltios (mV)</span>
+                                </div>
+                                <div class="flip-card-back bg-purple-600 text-white shadow-xl">
+                                    <h3 class="text-xs font-black uppercase mb-3 tracking-widest border-b border-white/20 pb-2 w-full text-center">¿Qué es RMS?</h3>
+                                    <p class="text-[11px] italic leading-relaxed text-center px-2">Representa la raíz de la media cuadrática. Es el método estándar para cuantificar la <strong>potencia eléctrica</strong> de la señal muscular.</p>
+                                    <div class="h-[1px] w-12 bg-white/30 my-4"></div>
+                                    <p class="text-[11px] text-center font-medium">Interpretación: Un aumento en el RMS indica mayor reclutamiento o fatiga inminente.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flip-card h-64 w-full" onclick="this.classList.toggle('flipped')">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front bg-white shadow-sm border border-slate-100">
+                                    <h3 class="text-[10px] font-black text-cyan-600 uppercase mb-4 tracking-widest italic">ARV (Average Rectified Value)</h3>
+                                    <div id="value-arv" class="text-7xl font-light text-cyan-600">--</div>
+                                    <span class="text-[9px] font-bold text-slate-400 uppercase mt-2">Milivoltios (mV)</span>
+                                </div>
+                                <div class="flip-card-back bg-cyan-600 text-white shadow-xl">
+                                    <h3 class="text-xs font-black uppercase mb-3 tracking-widest border-b border-white/20 pb-2 w-full text-center">¿Qué es ARV?</h3>
+                                    <p class="text-[11px] italic leading-relaxed text-center px-2">Es el promedio de la señal rectificada. Mide el área total bajo la curva de la señal en valor absoluto.</p>
+                                    <div class="h-[1px] w-12 bg-white/30 my-4"></div>
+                                    <p class="text-[11px] text-center font-medium">Interpretación: Es un estimador robusto del <strong>reclutamiento de unidades motoras</strong>.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
 
-    <main class="max-w-7xl mx-auto p-6">
-        
-        <div id="vista-info" class="py-12 space-y-12 animate-fade-in">
-            <div class="max-w-3xl">
-                <h2 class="text-5xl font-light text-slate-800 leading-tight mb-6 italic">Medición fisiológica <br><strong> de sEMG </strong></h2>
-                <p class="text-slate-500 text-lg leading-relaxed">Registro dinámico con marcado automático de puntos de contracción y visualización de métricas de potencia y reclutamiento.</p>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
-                    <p class="text-[10px] font-black text-blue-600 uppercase mb-2 tracking-widest">Hardware</p>
-                    <p class="text-sm font-bold text-slate-700 italic">MyoWare 2.0 & Arduino Uno R4 WiFi</p>
-                </div>
-                <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
-                    <p class="text-[10px] font-black text-purple-600 uppercase mb-2 tracking-widest">Métrica RMS</p>
-                    <p class="text-sm font-bold text-slate-700 italic">Root Mean Square</p>
-                    <p class="text-[11px] text-slate-400 mt-2">Cálculo de la potencia promedio de la señal.</p>
-                </div>
-                <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
-                    <p class="text-[10px] font-black text-cyan-600 uppercase mb-2 tracking-widest">Métrica ARV</p>
-                    <p class="text-sm font-bold text-slate-700 italic">Average Rectified Value</p>
-                    <p class="text-[11px] text-slate-400 mt-2">Nivel de reclutamiento de unidades motoras.</p>
-                </div>
-            </div>
-
-            <button onclick="openControlPopup()" class="w-full bg-blue-600 p-8 rounded-[32px] text-white shadow-2xl flex justify-between items-center hover:scale-[1.01] transition-all">
-                <div class="text-left">
-                    <h3 class="text-xl font-bold italic uppercase tracking-tighter">Nueva Sesión de Lectura</h3>
-                    <p class="text-sm opacity-80 font-medium">Inicia el registro en tiempo real con análisis automático.</p>
-                </div>
-                <span class="bg-white text-blue-600 px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest">Comenzar</span>
-            </button>
-        </div>
-
-        <div id="vista-monitor" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6 animate-fade-in">
-            
-            <div class="lg:col-span-3 space-y-4">
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 text-center">
-                    <h3 class="text-[10px] font-black text-slate-400 uppercase mb-4 tracking-widest">Contador de Repeticiones</h3>
-                    <p id="main-counter" class="text-7xl font-light text-blue-600">0</p>
-                    <div class="w-full bg-slate-100 h-2 rounded-full mt-4 overflow-hidden">
-                        <div id="global-progress" class="bg-blue-600 h-full w-0 transition-all duration-700"></div>
-                    </div>
-                </div>
-
-                <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 space-y-3">
-                    <h3 class="text-[9px] font-black text-slate-400 uppercase tracking-widest text-center italic">Marcas de Tiempo (s)</h3>
-                    <div class="max-h-40 overflow-y-auto pr-1" id="rep-table-body">
-                        <table class="w-full text-[10px] text-left">
-                            <tbody id="table-entries" class="divide-y divide-slate-50">
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 space-y-3">
-                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Información de Sesión (Opcional)</h3>
-                    <input type="text" id="paciente-id" placeholder="ID Paciente" class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] italic focus:ring-2 focus:ring-blue-500/20 outline-none">
-                    <input type="text" id="doctor-id" placeholder="Personal de salud encargado" class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] italic focus:ring-2 focus:ring-blue-500/20 outline-none">
-                </div>
-
-                <div class="space-y-2">
-                    <button onclick="descargarCSV()" class="w-full py-4 bg-emerald-500 text-white rounded-2xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-emerald-100 hover:bg-emerald-600 transition-all">Exportar Datos Excel (.csv) ⤓</button>
-                    <button onclick="requestReset()" class="w-full py-4 border-2 border-dashed border-slate-200 rounded-2xl text-[9px] font-black text-slate-400 hover:text-blue-500 hover:border-blue-200 transition-all uppercase tracking-widest">Reiniciar Sesión ↺</button>
-                </div>
-            </div>
-
-            <div class="lg:col-span-9 space-y-6">
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 id="chart-title" class="text-[10px] font-black text-slate-400 uppercase tracking-widest italic text-blue-600">Señal RAW en Tiempo Real</h3>
-                        <div class="flex gap-2">
-                            <span class="w-2 h-2 rounded-full bg-blue-500"></span>
-                            <span class="w-2 h-2 rounded-full bg-slate-100"></span>
-                        </div>
-                    </div>
-                    <div class="h-80"><canvas id="rawChart"></canvas></div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="flip-card h-64 w-full" onclick="this.classList.toggle('flipped')">
-                        <div class="flip-card-inner">
-                            <div class="flip-card-front bg-white shadow-sm border border-slate-100">
-                                <h3 class="text-[10px] font-black text-purple-600 uppercase mb-4 tracking-widest italic">RMS (Root Mean Square)</h3>
-                                <div id="value-rms" class="text-7xl font-light text-purple-600">--</div>
-                                <span class="text-[9px] font-bold text-slate-400 uppercase mt-2">Milivoltios (mV)</span>
-                            </div>
-                            <div class="flip-card-back bg-purple-600 text-white shadow-xl">
-                                <h3 class="text-xs font-black uppercase mb-3 tracking-widest border-b border-white/20 pb-2 w-full text-center">¿Qué es RMS?</h3>
-                                <p class="text-[11px] italic leading-relaxed text-center px-2">Representa la raíz de la media cuadrática. Es el método estándar para cuantificar la <strong>potencia eléctrica</strong> de la señal muscular.</p>
-                                <div class="h-[1px] w-12 bg-white/30 my-4"></div>
-                                <p class="text-[11px] text-center font-medium">Interpretación: Un aumento en el RMS indica mayor reclutamiento o fatiga inminente.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flip-card h-64 w-full" onclick="this.classList.toggle('flipped')">
-                        <div class="flip-card-inner">
-                            <div class="flip-card-front bg-white shadow-sm border border-slate-100">
-                                <h3 class="text-[10px] font-black text-cyan-600 uppercase mb-4 tracking-widest italic">ARV (Average Rectified Value)</h3>
-                                <div id="value-arv" class="text-7xl font-light text-cyan-600">--</div>
-                                <span class="text-[9px] font-bold text-slate-400 uppercase mt-2">Milivoltios (mV)</span>
-                            </div>
-                            <div class="flip-card-back bg-cyan-600 text-white shadow-xl">
-                                <h3 class="text-xs font-black uppercase mb-3 tracking-widest border-b border-white/20 pb-2 w-full text-center">¿Qué es ARV?</h3>
-                                <p class="text-[11px] italic leading-relaxed text-center px-2">Es el promedio de la señal rectificada. Mide el área total bajo la curva de la señal en valor absoluto.</p>
-                                <div class="h-[1px] w-12 bg-white/30 my-4"></div>
-                                <p class="text-[11px] text-center font-medium">Interpretación: Es un estimador robusto del <strong>reclutamiento de unidades motoras</strong>.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
+    <!-- Pantalla de Bienvenida (Se ve si NO hay sesión) -->
+    <div id="auth-welcome-screen" class="flex flex-col items-center justify-center min-h-[80vh] text-center px-6">
+        <h2 class="text-4xl font-light text-slate-800 italic mb-4">Acceso al <strong>Monitor Clínico</strong></h2>
+        <p class="text-slate-500 mb-8 max-w-md">Para visualizar los registros de sEMG en tiempo real, por favor inicia sesión con tu cuenta autorizada.</p>
+        <button onclick="loginConGoogle()" class="bg-white border border-slate-200 px-8 py-4 rounded-2xl shadow-sm hover:shadow-md transition-all flex items-center gap-3 font-bold text-slate-700">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20">
+            Continuar con Google
+        </button>
+    </div>
 
     <div id="controlPopup" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
         <div class="bg-white max-w-lg w-full rounded-[40px] shadow-2xl p-12 transform transition-all">
@@ -210,8 +224,54 @@
         </div>
     </div>
 
+    <!-- LÓGICA DE FIREBASE (GOOGLE AUTH) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB18-JLdzix9vqyp11VBEcjXiVAm4p8dEg",
+            authDomain: "bioinstrudigitaleq6.firebaseapp.com",
+            projectId: "bioinstrudigitaleq6",
+            storageBucket: "bioinstrudigitaleq6.firebasestorage.app",
+            messagingSenderId: "993054277520",
+            appId: "1:993054277520:web:be3101c71dbfd8f6557d15",
+            measurementId: "G-XEGYMBG40J"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+
+        window.loginConGoogle = () => {
+            signInWithPopup(auth, provider).catch(err => console.error(err));
+        };
+
+        window.logout = () => {
+            signOut(auth);
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            const content = document.getElementById('auth-required-content');
+            const welcome = document.getElementById('auth-welcome-screen');
+            const navBtn = document.getElementById('btn-auth-google');
+
+            if (user) {
+                content.style.display = 'block';
+                welcome.style.display = 'none';
+                navBtn.innerText = 'LogOut';
+                navBtn.onclick = window.logout;
+            } else {
+                content.style.display = 'none';
+                welcome.style.display = 'flex';
+                navBtn.innerText = 'Iniciar Sesión';
+                navBtn.onclick = window.loginConGoogle;
+            }
+        });
+    </script>
+
+    <!-- TU LÓGICA ORIGINAL DE GRÁFICAS -->
     <script>
-        // --- VARIABLES DE ESTADO ---
         let isRecording = false;
         let count = 0;
         let allRawLabels = []; 
@@ -227,7 +287,6 @@
             }
         };
 
-        // --- CONTROL DE MODAL ---
         function openControlPopup() { document.getElementById('controlPopup').classList.remove('hidden'); }
         function closeControlPopup() { document.getElementById('controlPopup').classList.add('hidden'); }
 
@@ -235,14 +294,13 @@
             closeControlPopup();
             document.getElementById('vista-info').classList.add('hidden');
             document.getElementById('vista-monitor').classList.remove('hidden');
-            document.getElementById('global-status-bar').style.backgroundColor = "#feb9cf"; // Baby Pink
+            document.getElementById('global-status-bar').style.backgroundColor = "#feb9cf"; 
             document.getElementById('status-text').innerText = "REGISTRO EN VIVO";
             document.getElementById('status-text').classList.replace('text-slate-500', 'text-white');
             document.getElementById('status-indicator').classList.replace('bg-slate-300', 'bg-white');
             isRecording = true;
         }
 
-        // --- CONFIGURACIÓN DE GRÁFICA ---
         const rawChartCtx = document.getElementById('rawChart').getContext('2d');
         const rawChart = new Chart(rawChartCtx, {
             type: 'line',
@@ -275,27 +333,20 @@
             }
         });
 
-        // --- BUCLE DE SIMULACIÓN / RECEPCIÓN ---
         setInterval(() => {
             if (!isRecording) return;
-            
             const rawVal = Math.random() * 100;
             const time = new Date().toLocaleTimeString('es-MX', { hour12: false });
-
             allRawLabels.push(time);
             allRawValues.push(rawVal);
-
             rawChart.data.labels.push(time);
             rawChart.data.datasets[0].data.push(rawVal);
             rawChart.data.datasets[1].data.push(null); 
-
             if (rawChart.data.labels.length > 50) {
                 rawChart.data.labels.shift();
                 rawChart.data.datasets[0].data.shift();
                 rawChart.data.datasets[1].data.shift();
             }
-
-            // Lógica de Repeticiones
             if(rawVal > 60 && canCountRep && count < 10) {
                 count++;
                 canCountRep = false;
@@ -303,10 +354,8 @@
                 document.getElementById('main-counter').innerText = count;
                 document.getElementById('global-progress').style.width = (count * 10) + "%";
                 rawChart.data.datasets[1].data[rawChart.data.datasets[1].data.length - 1] = rawVal;
-
                 const tableBody = document.getElementById('table-entries');
                 tableBody.innerHTML = `<tr class="animate-fade-in"><td class="py-2 font-bold text-slate-700">Rep ${count}</td><td class="py-2 text-right font-mono text-blue-600">${time}</td></tr>` + tableBody.innerHTML;
-
                 if(count === 10) { 
                     isRecording = false; 
                     finalizarYExpandirGrafica(); 
@@ -321,52 +370,31 @@
             document.getElementById('global-status-bar').style.backgroundColor = "#10b981"; 
             document.getElementById('status-text').innerText = "ANÁLISIS COMPLETADO";
             document.getElementById('chart-title').innerText = "SESIÓN COMPLETA - ANÁLISIS DE DATOS";
-            
             rawChart.data.labels = allRawLabels;
             rawChart.data.datasets[0].data = allRawValues;
-            
             let finalMarkers = new Array(allRawValues.length).fill(null);
             repMarkerIndices.forEach(idx => { finalMarkers[idx] = allRawValues[idx]; });
             rawChart.data.datasets[1].data = finalMarkers;
             rawChart.update();
-
             const n = allRawValues.length;
             const rms = Math.sqrt(allRawValues.reduce((sum, v) => sum + v*v, 0) / n);
             const arv = allRawValues.reduce((sum, v) => sum + Math.abs(v), 0) / n;
-            
             document.getElementById('value-rms').innerText = rms.toFixed(2);
             document.getElementById('value-arv').innerText = arv.toFixed(2);
         }
 
-        // --- FUNCIÓN SOLICITADA: REINICIO DE DATOS SIN SALIR ---
         function requestReset() {
             if (confirm("¿Seguro que deseas reiniciar la lectura? Se borrarán los datos actuales.")) {
-                // Resetear estado
-                count = 0;
-                allRawLabels = [];
-                allRawValues = [];
-                repMarkerIndices = [];
-                canCountRep = true;
-                isRecording = true; 
-
-                // Resetear UI
+                count = 0; allRawLabels = []; allRawValues = []; repMarkerIndices = []; canCountRep = true; isRecording = true; 
                 document.getElementById('main-counter').innerText = "0";
                 document.getElementById('global-progress').style.width = "0%";
                 document.getElementById('table-entries').innerHTML = "";
                 document.getElementById('value-rms').innerText = "--";
                 document.getElementById('value-arv').innerText = "--";
                 document.getElementById('chart-title').innerText = "Señal RAW en Tiempo Real";
-
-                // Resetear barra de estado (Volver a Baby Pink)
                 document.getElementById('global-status-bar').style.backgroundColor = "#feb9cf";
                 document.getElementById('status-text').innerText = "REGISTRO EN VIVO";
-                document.getElementById('status-text').className = "text-[9px] font-bold uppercase tracking-widest text-white italic text-center";
-                document.getElementById('status-indicator').className = "w-2 h-2 rounded-full bg-white animate-pulse";
-
-                // Resetear Gráfica
-                rawChart.data.labels = [];
-                rawChart.data.datasets[0].data = [];
-                rawChart.data.datasets[1].data = [];
+                rawChart.data.labels = []; rawChart.data.datasets[0].data = []; rawChart.data.datasets[1].data = [];
                 rawChart.update();
             }
         }
@@ -376,28 +404,16 @@
             const doc = document.getElementById('doctor-id').value || "      ";
             const rmsVal = document.getElementById('value-rms').innerText;
             const arvVal = document.getElementById('value-arv').innerText;
-
-            // 1. Cabecera con Información del Paciente y Personal
             let csvContent = "INFORME\n";
             csvContent += `Paciente ID: ,${pac}\n`;
             csvContent += `Personal encargado: ,${doc}\n`;
             csvContent += `Fecha: ,${new Date().toLocaleDateString()}\n\n`;
-
-            // 2. Datos de la Señal
             csvContent += "REGISTRO DE MEDICIONES\n";
             csvContent += "Timestamp,Valor_mV\n";
-            allRawLabels.forEach((t, i) => { 
-                csvContent += `${t},${allRawValues[i].toFixed(2)}\n`; 
-            });
-
-            // 3. Cálculos de Promedio
+            allRawLabels.forEach((t, i) => { csvContent += `${t},${allRawValues[i].toFixed(2)}\n`; });
             csvContent += `\nRESUMEN DE RESULTADOS\n`;
             csvContent += `RMS Promedio (mV): ,${rmsVal}\n`;
             csvContent += `ARV Promedio (mV): ,${arvVal}\n\n`;
-
-            // 4. Link de Información
-            csvContent += `Para mayor información visite: ,https://semg-bioinstrudigital.onrender.com\n`;
-
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
