@@ -11,6 +11,19 @@
             <h2 class="text-2xl font-light text-slate-800 uppercase tracking-tighter">Acceso al Sistema</h2>
             <p class="text-[10px] text-blue-500 font-bold uppercase tracking-[0.3em] mt-2">Monitor sEMG Pro</p>
         </div>
+
+        <!-- BOTONES SOCIALES AÑADIDOS -->
+        <div class="grid grid-cols-2 gap-3 mb-8">
+            <button onclick="loginGoogle()" class="flex items-center justify-center gap-2 border border-gray-100 py-3 rounded-md hover:bg-gray-50 transition-all shadow-sm">
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-4 h-4">
+                <span class="text-[9px] font-black uppercase tracking-widest text-slate-500">Google</span>
+            </button>
+            <button onclick="loginMicrosoft()" class="flex items-center justify-center gap-2 bg-[#2F2F2F] py-3 rounded-md hover:bg-black transition-all shadow-sm">
+                <img src="https://www.svgrepo.com/show/331495/microsoft.svg" class="w-4 h-4">
+                <span class="text-[9px] font-black uppercase tracking-widest text-white">Microsoft</span>
+            </button>
+        </div>
+
         <form method="POST" class="space-y-6">
             <input type="text" name="username" placeholder="Usuario" class="w-full border-b border-gray-200 py-2 focus:border-blue-500 outline-none transition text-sm" required>
             <input type="password" name="password" placeholder="Contraseña" class="w-full border-b border-gray-200 py-2 focus:border-blue-500 outline-none transition text-sm" required>
@@ -20,5 +33,31 @@
             <a href="/registro" class="text-[10px] font-bold text-gray-400 hover:text-blue-500 transition uppercase tracking-widest">¿Nuevo usuario? Regístrate aquí</a>
         </div>
     </div>
+
+    <!-- SDK DE FIREBASE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, OAuthProvider } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB18-JLdzix9vqyp11VBEcjXiVAm4p8dEg",
+            authDomain: "bioinstrudigitaleq6.firebaseapp.com",
+            projectId: "bioinstrudigitaleq6",
+            storageBucket: "bioinstrudigitaleq6.firebasestorage.app",
+            messagingSenderId: "993054277520",
+            appId: "1:993054277520:web:be3101c71dbfd8f6557d15",
+            measurementId: "G-XEGYMBG40J"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        window.loginGoogle = () => {
+            signInWithPopup(auth, new GoogleAuthProvider()).then(() => window.location.href = "/");
+        };
+        window.loginMicrosoft = () => {
+            signInWithPopup(auth, new OAuthProvider('microsoft.com')).then(() => window.location.href = "/");
+        };
+    </script>
 </body>
 </html>
