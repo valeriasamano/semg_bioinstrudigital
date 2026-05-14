@@ -76,6 +76,22 @@
             <div class="max-w-3xl">
                 <h2 class="text-5xl font-light text-slate-800 leading-tight mb-6 italic">Medición fisiológica <br><strong> de sEMG </strong></h2>
                 <p class="text-slate-500 text-lg leading-relaxed">Registro dinámico con marcado automático de puntos de contracción y visualización de métricas de potencia y reclutamiento.</p>
+                
+                <!-- BOTONES DE LOGIN AGREGADOS -->
+                <div id="auth-section" class="flex flex-col md:flex-row gap-4 mt-8">
+                    <button onclick="loginGoogle()" class="flex-1 flex items-center justify-center gap-3 bg-white border border-slate-200 p-4 rounded-2xl hover:bg-slate-50 transition-all shadow-sm">
+                        <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5">
+                        <span class="text-xs font-black uppercase tracking-widest text-slate-600">Google Login</span>
+                    </button>
+                    <button onclick="loginMicrosoft()" class="flex-1 flex items-center justify-center gap-3 bg-[#2F2F2F] p-4 rounded-2xl hover:bg-black transition-all shadow-sm">
+                        <img src="https://www.svgrepo.com/show/331495/microsoft.svg" class="w-5 h-5">
+                        <span class="text-xs font-black uppercase tracking-widest text-white">Microsoft Login</span>
+                    </button>
+                </div>
+                <div id="user-welcome" class="hidden mt-8 p-4 bg-blue-50 rounded-2xl border border-blue-100">
+                    <p class="text-blue-600 text-xs font-black uppercase tracking-widest">Personal Identificado:</p>
+                    <p id="user-display-name" class="text-slate-800 font-bold italic"></p>
+                </div>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -129,7 +145,7 @@
                     <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Información de Sesión (Opcional)</h3>
                     <input type="text" id="paciente-id" placeholder="ID Paciente" class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] italic focus:ring-2 focus:ring-blue-500/20 outline-none">
                     <input type="text" id="doctor-id" placeholder="Personal de salud encargado" class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] italic focus:ring-2 focus:ring-blue-500/20 outline-none">
-                    <input type="text" id="doctor-id" placeholder="Correo de personal de salud" class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] italic focus:ring-2 focus:ring-blue-500/20 outline-none">
+                    <input type="text" id="doctor-email" placeholder="Correo de personal de salud" class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] italic focus:ring-2 focus:ring-blue-500/20 outline-none">
 
                 </div>
 
@@ -211,6 +227,52 @@
             </div>
         </div>
     </div>
+
+    <!-- FIREBASE SDK INTEGRATION -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-analytics.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, OAuthProvider } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB18-JLdzix9vqyp11VBEcjXiVAm4p8dEg",
+            authDomain: "bioinstrudigitaleq6.firebaseapp.com",
+            projectId: "bioinstrudigitaleq6",
+            storageBucket: "bioinstrudigitaleq6.firebasestorage.app",
+            messagingSenderId: "993054277520",
+            appId: "1:993054277520:web:be3101c71dbfd8f6557d15",
+            measurementId: "G-XEGYMBG40J"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+
+        // Funciones de Login Globales
+        window.loginGoogle = function() {
+            const provider = new GoogleAuthProvider();
+            signInWithPopup(auth, provider).then((result) => {
+                updateUIWithUser(result.user);
+            }).catch((error) => console.error(error));
+        }
+
+        window.loginMicrosoft = function() {
+            const provider = new OAuthProvider('microsoft.com');
+            signInWithPopup(auth, provider).then((result) => {
+                updateUIWithUser(result.user);
+            }).catch((error) => console.error(error));
+        }
+
+        function updateUIWithUser(user) {
+            document.getElementById('auth-section').classList.add('hidden');
+            document.getElementById('user-welcome').classList.remove('hidden');
+            document.getElementById('user-display-name').innerText = user.displayName;
+            
+            // Auto-llenar campos de la sesión
+            document.getElementById('doctor-id').value = user.displayName;
+            document.getElementById('doctor-email').value = user.email;
+        }
+    </script>
 
     <script>
         // --- VARIABLES DE ESTADO ---
@@ -340,10 +402,8 @@
             document.getElementById('value-arv').innerText = arv.toFixed(2);
         }
 
-        // --- FUNCIÓN SOLICITADA: REINICIO DE DATOS SIN SALIR ---
         function requestReset() {
             if (confirm("¿Seguro que deseas reiniciar la lectura? Se borrarán los datos actuales.")) {
-                // Resetear estado
                 count = 0;
                 allRawLabels = [];
                 allRawValues = [];
@@ -351,7 +411,6 @@
                 canCountRep = true;
                 isRecording = true; 
 
-                // Resetear UI
                 document.getElementById('main-counter').innerText = "0";
                 document.getElementById('global-progress').style.width = "0%";
                 document.getElementById('table-entries').innerHTML = "";
@@ -359,13 +418,11 @@
                 document.getElementById('value-arv').innerText = "--";
                 document.getElementById('chart-title').innerText = "Señal RAW en Tiempo Real";
 
-                // Resetear barra de estado (Volver a Baby Pink)
                 document.getElementById('global-status-bar').style.backgroundColor = "#feb9cf";
                 document.getElementById('status-text').innerText = "REGISTRO EN VIVO";
                 document.getElementById('status-text').className = "text-[9px] font-bold uppercase tracking-widest text-white italic text-center";
                 document.getElementById('status-indicator').className = "w-2 h-2 rounded-full bg-white animate-pulse";
 
-                // Resetear Gráfica
                 rawChart.data.labels = [];
                 rawChart.data.datasets[0].data = [];
                 rawChart.data.datasets[1].data = [];
@@ -379,26 +436,20 @@
             const rmsVal = document.getElementById('value-rms').innerText;
             const arvVal = document.getElementById('value-arv').innerText;
 
-            // 1. Cabecera con Información del Paciente y Personal
             let csvContent = "INFORME\n";
             csvContent += `Paciente ID: ,${pac}\n`;
             csvContent += `Personal encargado: ,${doc}\n`;
             csvContent += `Fecha: ,${new Date().toLocaleDateString()}\n\n`;
 
-            // 2. Datos de la Señal
             csvContent += "REGISTRO DE MEDICIONES\n";
             csvContent += "Timestamp,Valor_mV\n";
             allRawLabels.forEach((t, i) => { 
                 csvContent += `${t},${allRawValues[i].toFixed(2)}\n`; 
             });
 
-            // 3. Cálculos de Promedio
             csvContent += `\nRESUMEN DE RESULTADOS\n`;
             csvContent += `RMS Promedio (mV): ,${rmsVal}\n`;
             csvContent += `ARV Promedio (mV): ,${arvVal}\n\n`;
-
-            // 4. Link de Información
-            csvContent += `Para más info: ,https://semg-bioinstrudigital.onrender.com\n`;
 
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
