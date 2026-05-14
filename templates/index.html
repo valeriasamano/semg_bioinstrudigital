@@ -60,7 +60,7 @@
         </div>
         <div class="space-x-8 text-[10px] font-black uppercase tracking-widest flex items-center">
             <a href="/" class="text-blue-600 border-b-2 border-blue-600 pb-1">Monitor</a>
-            <a href="/prototipo" class="text-slate-400 hover:text-blue-600 transition">Prototipo</a>
+            <a href="/sesiones" class="text-slate-400 hover:text-blue-600 transition">Sesiones Pasadas</a>
             <a href="{{ url_for('logout') }}" class="bg-red-50 text-red-500 px-4 py-2 rounded-full hover:bg-red-500 hover:text-white transition-all font-black">LogOut</a>
         </div>
     </nav>
@@ -129,8 +129,7 @@
                     <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Información de Sesión (Opcional)</h3>
                     <input type="text" id="paciente-id" placeholder="ID Paciente" class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] italic focus:ring-2 focus:ring-blue-500/20 outline-none">
                     <input type="text" id="doctor-id" placeholder="Personal de salud encargado" class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] italic focus:ring-2 focus:ring-blue-500/20 outline-none">
-                    <input type="text" id="doctor-id" placeholder="Correo de personal de salud" class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] italic focus:ring-2 focus:ring-blue-500/20 outline-none">
-
+                    <input type="text" id="doctor-email" placeholder="Correo de personal de salud" class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] italic focus:ring-2 focus:ring-blue-500/20 outline-none">
                 </div>
 
                 <div class="space-y-2">
@@ -338,6 +337,18 @@
             
             document.getElementById('value-rms').innerText = rms.toFixed(2);
             document.getElementById('value-arv').innerText = arv.toFixed(2);
+
+            // --- INSERCIÓN: GUARDADO AUTOMÁTICO EN BD ---
+            fetch('/api/guardar-sesion', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    patient_id: document.getElementById('paciente-id').value || "Anónimo",
+                    doctor_name: document.getElementById('doctor-id').value || "Sin asignar",
+                    rms: rms.toFixed(2),
+                    arv: arv.toFixed(2)
+                })
+            }).then(res => res.json()).then(data => console.log("Sesión guardada en historial."));
         }
 
         // --- FUNCIÓN SOLICITADA: REINICIO DE DATOS SIN SALIR ---
