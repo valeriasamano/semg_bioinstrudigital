@@ -13,19 +13,19 @@
         </div>
 
         <div class="grid grid-cols-2 gap-3 mb-8">
-            <button onclick="loginGoogle()" class="flex items-center justify-center gap-2 border border-gray-100 py-3 rounded-md hover:bg-gray-50 transition-all shadow-sm">
+            <button onclick="handleGoogle()" class="flex items-center justify-center gap-2 border border-gray-100 py-3 rounded-md hover:bg-gray-50 transition-all shadow-sm">
                 <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-4 h-4">
                 <span class="text-[9px] font-black uppercase tracking-widest text-slate-500">Google</span>
             </button>
-            <button onclick="loginMicrosoft()" class="flex items-center justify-center gap-2 bg-[#2F2F2F] py-3 rounded-md hover:bg-black transition-all shadow-sm">
+            <button class="flex items-center justify-center gap-2 bg-[#2F2F2F] py-3 rounded-md opacity-50 cursor-not-allowed">
                 <img src="https://www.svgrepo.com/show/331495/microsoft.svg" class="w-4 h-4">
                 <span class="text-[9px] font-black uppercase tracking-widest text-white">Microsoft</span>
             </button>
         </div>
 
         <form method="POST" class="space-y-6">
-            <input type="text" name="username" placeholder="Usuario" class="w-full border-b border-gray-200 py-2 focus:border-blue-500 outline-none transition text-sm" required>
-            <input type="password" name="password" placeholder="Contraseña" class="w-full border-b border-gray-200 py-2 focus:border-blue-500 outline-none transition text-sm" required>
+            <input type="text" name="username" placeholder="Usuario" class="w-full border-b border-gray-200 py-2 focus:border-blue-500 outline-none text-sm" required>
+            <input type="password" name="password" placeholder="Contraseña" class="w-full border-b border-gray-200 py-2 focus:border-blue-500 outline-none text-sm" required>
             <button type="submit" class="w-full bg-slate-900 text-white py-4 text-[10px] font-bold uppercase tracking-widest hover:bg-blue-600 transition-all">Entrar</button>
         </form>
         <div class="mt-8 text-center">
@@ -35,38 +35,32 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, OAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyB18-JLdzix9vqyp11VBEcjXiVAm4p8dEg",
             authDomain: "bioinstrudigitaleq6.firebaseapp.com",
             projectId: "bioinstrudigitaleq6",
             storageBucket: "bioinstrudigitaleq6.firebasestorage.app",
-            messagingSenderId: "993054277520",
-            appId: "1:993054277520:web:be3101c71dbfd8f6557d15",
-            measurementId: "G-XEGYMBG40J"
+            appId: "1:993054277520:web:be3101c71dbfd8f6557d15"
         };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        window.loginGoogle = () => {
+        window.handleGoogle = () => {
             const provider = new GoogleAuthProvider();
             signInWithPopup(auth, provider)
-                .then(() => {
-                    // REDIRECCIÓN A LA RUTA DE FLASK (RAÍZ)
-                    window.location.assign("/"); 
+                .then((result) => {
+                    return fetch('/login-google', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: result.user.email })
+                    });
                 })
-                .catch((err) => console.error(err));
-        };
-
-        window.loginMicrosoft = () => {
-            const provider = new OAuthProvider('microsoft.com');
-            signInWithPopup(auth, provider)
-                .then(() => {
-                    window.location.assign("/");
-                })
-                .catch((err) => console.error(err));
+                .then(res => res.json())
+                .then(data => { if(data.success) window.location.assign("/"); })
+                .catch(err => console.error(err));
         };
     </script>
 </body>
