@@ -1,14 +1,11 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
+from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
-from datetime import datetime
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'biomedica_tec_2026'
-
-# Conexión a la base de datos de Render
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -16,26 +13,37 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
-# MODELO DE USUARIO
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
 
-# CARGAR USUARIO
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# RUTAS
+# --- NUEVA RUTA PARA FIREBASE ---
+@app.route('/login-google', methods=['POST'])
+def login_google_api():
+    data = request.json
+    email = data.get('email')
+    
+    user = User.query.filter_by(username=email).first()
+    
+    if not user:
+        # Si no existe, lo creamos con una contraseña aleatoria
+        hashed_pw = generate_password_hash(os.urandom(24).hex())
+        user = User(username=email, password=hashed_pw)
+        db.session.add(user)
+        db.session.commit()
+    
+    login_user(user)
+    return jsonify({"success": True})
+
 @app.route('/')
 @login_required
 def home():
     return render_template('index.html', name=current_user.username)
-
-@app.route('/prototipo')
-def prototipo():
-    return render_template('prototipo.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -50,7 +58,6 @@ def login():
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
     if request.method == 'POST':
-        # Verificamos si el usuario ya existe
         exists = User.query.filter_by(username=request.form['username']).first()
         if not exists:
             hashed_pw = generate_password_hash(request.form['password'])
@@ -67,9 +74,7 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
-# CREAR TABLAS
-with app.app_context():
-    db.create_all()
-
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)
