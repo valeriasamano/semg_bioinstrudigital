@@ -372,31 +372,31 @@
         }
 
         function descargarCSV() {
-            const pac = document.getElementById('paciente-id').value || "Paciente No Identificado";
-            const doc = document.getElementById('doctor-id').value || "No Asignado";
+            const pac = document.getElementById('paciente-id').value || "    ";
+            const doc = document.getElementById('doctor-id').value || "      ";
             const rmsVal = document.getElementById('value-rms').innerText;
             const arvVal = document.getElementById('value-arv').innerText;
 
             // 1. Cabecera con Información del Paciente y Personal
-            let csvContent = "INFORME DE SESIÓN";
+            let csvContent = "INFORME\n";
             csvContent += `Paciente ID: ,${pac}\n`;
             csvContent += `Personal encargado: ,${doc}\n`;
             csvContent += `Fecha: ,${new Date().toLocaleDateString()}\n\n`;
 
             // 2. Datos de la Señal
-            csvContent += "REGISTRO DE MEDICIONES";
+            csvContent += "REGISTRO DE MEDICIONES\n";
             csvContent += "Timestamp,Valor_mV\n";
             allRawLabels.forEach((t, i) => { 
                 csvContent += `${t},${allRawValues[i].toFixed(2)}\n`; 
             });
 
             // 3. Cálculos de Promedio
-            csvContent += `\RESUMEN DE RESULTADOS`;
+            csvContent += `\nRESUMEN DE RESULTADOS\n`;
             csvContent += `RMS Promedio (mV): ,${rmsVal}\n`;
             csvContent += `ARV Promedio (mV): ,${arvVal}\n\n`;
 
             // 4. Link de Información
-            csvContent += `Para mayor información visite: ,https://semg-bioinstrudigital.onrender.com/\n`;
+            csvContent += `Para mayor información visite: ,https://semg-bioinstrudigital.onrender.com\n`;
 
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
