@@ -12,7 +12,6 @@
             <p class="text-[10px] text-blue-500 font-bold uppercase tracking-[0.3em] mt-2">Monitor sEMG Pro</p>
         </div>
 
-        <!-- BOTONES SOCIALES AÑADIDOS -->
         <div class="grid grid-cols-2 gap-3 mb-8">
             <button onclick="loginGoogle()" class="flex items-center justify-center gap-2 border border-gray-100 py-3 rounded-md hover:bg-gray-50 transition-all shadow-sm">
                 <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-4 h-4">
@@ -34,10 +33,9 @@
         </div>
     </div>
 
-    <!-- SDK DE FIREBASE -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, OAuthProvider } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, OAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyB18-JLdzix9vqyp11VBEcjXiVAm4p8dEg",
@@ -53,10 +51,17 @@
         const auth = getAuth(app);
 
         window.loginGoogle = () => {
-            signInWithPopup(auth, new GoogleAuthProvider()).then(() => window.location.href = "/");
+            const provider = new GoogleAuthProvider();
+            signInWithPopup(auth, provider)
+                .then(() => window.location.assign("index.html"))
+                .catch((err) => console.error(err));
         };
+
         window.loginMicrosoft = () => {
-            signInWithPopup(auth, new OAuthProvider('microsoft.com')).then(() => window.location.href = "/");
+            const provider = new OAuthProvider('microsoft.com');
+            signInWithPopup(auth, provider)
+                .then(() => window.location.assign("index.html"))
+                .catch((err) => console.error(err));
         };
     </script>
 </body>
