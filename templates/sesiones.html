@@ -11,9 +11,9 @@
 
     <nav class="bg-white border-b border-slate-200 py-4 px-8 flex justify-between items-center shadow-sm">
         <div class="flex items-center gap-3">
-            <h1 class="text-xl font-bold tracking-tighter text-slate-800 italic">Bioinstrumentación Digital - Historial</h1>
+            <h1 class="text-xl font-bold tracking-tighter text-slate-800 italic text-[14px]">Bioinstrumentación Digital - Historial</h1>
         </div>
-        <div class="space-x-8 text-[12px] font-black uppercase tracking-widest flex items-center">
+        <div class="space-x-8 text-[10px] font-black uppercase tracking-widest flex items-center">
             <a href="/" class="text-slate-400 hover:text-blue-600 transition">Monitor</a>
             <a href="/sesiones" class="text-blue-600 border-b-2 border-blue-600 pb-1">Sesiones Pasadas</a>
             <a href="/logout" class="bg-red-50 text-red-500 px-4 py-2 rounded-full font-black hover:bg-red-100 transition">LogOut</a>
@@ -21,10 +21,17 @@
     </nav>
 
     <main class="max-w-6xl mx-auto mt-12 p-6">
-        <header class="mb-10">
-            <h2 class="text-3xl font-extrabold text-slate-800">Historial de Mediciones</h2>
-            <p class="text-slate-500 mt-2">Consulta los registros guardados de electromiografía de superficie.</p>
-        </header>
+        <div class="flex justify-between items-end mb-10">
+            <div>
+                <h2 class="text-3xl font-extrabold text-slate-800">Historial de Mediciones</h2>
+                <p class="text-slate-500 mt-2">Consulta los registros guardados de electromiografía de superficie.</p>
+            </div>
+            
+            <a href="/descargar-csv" class="bg-green-600 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-green-700 transition flex items-center gap-2 shadow-lg shadow-green-100">
+                <i class="fa-solid fa-file-csv text-lg"></i>
+                Descargar CSV
+            </a>
+        </div>
 
         <div class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
             <table class="w-full text-left border-collapse">
@@ -35,6 +42,7 @@
                         <th class="px-6 py-4 text-xs font-black uppercase tracking-wider text-slate-400">Médico</th>
                         <th class="px-6 py-4 text-xs font-black uppercase tracking-wider text-slate-400">RMS Promedio</th>
                         <th class="px-6 py-4 text-xs font-black uppercase tracking-wider text-slate-400">ARV Promedio</th>
+                        <th class="px-6 py-4 text-xs font-black uppercase tracking-wider text-slate-400 text-center">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-50">
@@ -57,13 +65,19 @@
                         <td class="px-6 py-4 font-mono text-sm text-indigo-600 font-bold">
                             {{ "%.4f"|format(sesion.arv_avg) }} mV
                         </td>
+                        <td class="px-6 py-4 text-center">
+                            <form action="{{ url_for('borrar_sesion', id=sesion.id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de borrar esta sesión?');">
+                                <button type="submit" class="text-red-300 hover:text-red-600 transition">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </form>
+                        </td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="5" class="px-6 py-20 text-center">
+                        <td colspan="6" class="px-6 py-20 text-center">
                             <i class="fa-solid fa-folder-open text-slate-200 text-5xl mb-4 block"></i>
                             <p class="text-slate-400 font-medium">No se han encontrado sesiones registradas.</p>
-                            <a href="/" class="text-blue-500 text-sm font-bold mt-2 inline-block hover:underline">Comenzar una nueva medición</a>
                         </td>
                     </tr>
                     {% endfor %}
